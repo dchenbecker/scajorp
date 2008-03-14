@@ -24,11 +24,20 @@ class JSONParser {
     instance
   }
 
+  /**
+    *   Creates a Map containing Method objects reflecting all public setter methods of the class or interface
+    *   represented by the passed in Class object, as values. For keys, the stripped down fieldnames of the
+    *   respective setter methods are used. Works with Scala setters_ and Java setMethods().
+    *
+    *   E.g. Scala: name_     :      map += ("name" -> method)
+    *        Java: setName()  :      map += ("name" -> method)
+    *
+    **/
   private def createSetterFieldMap(cls: Class[_ <: Any]): mutable.Map[String, Method] = {
 
         val result = mutable.Map.empty[String, Method]
 
-        val methods = cls.getDeclaredMethods()
+        val methods = cls.getMethods()
 
         for (method <- methods) {
 
