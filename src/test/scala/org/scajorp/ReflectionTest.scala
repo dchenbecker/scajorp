@@ -5,11 +5,15 @@ import org.junit.Before
 import org.junit.After
 import org.junit.Assert._
 
+import java.lang.reflect.Method
+
 class ReflectionTest {
 
     val jsonParser = new JSONParser
 
-    val jsonObject: Map[String, Any] = Map("name" -> "Johnny")
+    val jsonObject: Map[String, Any] = Map("name" -> "Johnny", "age" -> 99)
+
+
 
 
     val className = "org.scajorp.UserDummy"
@@ -24,7 +28,8 @@ class ReflectionTest {
     def assignValues {
         val user: UserDummy = (jsonParser.createClassInstance(className, jsonObject)).asInstanceOf[UserDummy]
         assertEquals("Johnny", user.name)
-        //assertEquals(99, user.age)
+        assertEquals(99, user.getAge)
     }
-                         
+
+                
 }
