@@ -1,0 +1,30 @@
+package org.scajorp
+
+import org.junit.Test
+import org.junit.Before
+import org.junit.After
+import org.junit.Assert._
+
+class ReflectionTest {
+
+    val jsonParser = new JSONParser
+
+    val jsonObject: Map[String, Any] = Map("name" -> "Johnny")
+
+
+    val className = "org.scajorp.UserDummy"
+
+    @Test
+    def createClassInstance {        
+        val user: UserDummy = (jsonParser.createClassInstance(className, jsonObject)).asInstanceOf[UserDummy]
+        assertNotNull("User could not be instantiated", user)
+    }
+
+    @Test
+    def assignValues {
+        val user: UserDummy = (jsonParser.createClassInstance(className, jsonObject)).asInstanceOf[UserDummy]
+        assertEquals("Johnny", user.name)
+        //assertEquals(99, user.age)
+    }
+                         
+}
