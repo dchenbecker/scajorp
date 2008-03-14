@@ -16,7 +16,7 @@ class JSONParser {
     for( (field,value) <- fields)
     {
        fieldMap(field) match {
-            case method: Method => method.invoke(instance, Array[Object](value.asInstanceOf[Object]));
+            case method => method.invoke(instance, Array[Object](value.asInstanceOf[Object]));
        }
 
     }
