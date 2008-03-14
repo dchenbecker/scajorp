@@ -7,33 +7,33 @@ import org.junit.Assert._
 
 import java.lang.reflect.Method
 
+
+
 class ReflectionTest {
 
     val jsonParser = new JSONParser
 
-    val jsonObject: Map[String, Any] = Map("name" -> "Johnny", "age" -> 99)
-
-
+    var jsonObject: Map[String, Any] = Map("jsonClass" -> "org.scajorp.UserDummy",
+                                            "name" -> "Johnny",
+                                             "age" -> 99)
 
 
     val className = "org.scajorp.UserDummy"
 
-    @Test
-    def createClassInstance {        
-        val user: UserDummy = (jsonParser.createClassInstance(className, jsonObject)).asInstanceOf[UserDummy]
-        assertNotNull("User could not be instantiated", user)
-    }
 
     @Test
-    def createClassInstanceFiltered {        
-	val filtered = jsonObject.filterKeys(_ == "name")
+    def createClassInstance {
+        val filtered = jsonObject.filterKeys(_ != "jsonClass")        
         val user: UserDummy = (jsonParser.createClassInstance(className, filtered)).asInstanceOf[UserDummy]
         assertNotNull("User could not be instantiated", user)
     }
 
+    
+
     @Test
     def assignValues {
-        val user: UserDummy = (jsonParser.createClassInstance(className, jsonObject)).asInstanceOf[UserDummy]
+        val filtered = jsonObject.filterKeys(_ != "jsonClass")
+        val user: UserDummy = (jsonParser.createClassInstance(className, filtered)).asInstanceOf[UserDummy]
         assertEquals("Johnny", user.name)
         assertEquals(99, user.getAge)
     }
