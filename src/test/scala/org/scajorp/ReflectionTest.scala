@@ -5,10 +5,6 @@ import org.junit.Before
 import org.junit.After
 import org.junit.Assert._
 
-import java.lang.reflect.Method
-
-
-
 class ReflectionTest {
 
     val jsonParser = new JSONParser
