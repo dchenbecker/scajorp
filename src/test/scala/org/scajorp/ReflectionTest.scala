@@ -25,6 +25,13 @@ class ReflectionTest {
     }
 
     @Test
+    def createClassInstanceFiltered {        
+	val filtered = jsonObject.filterKeys(_ == "name")
+        val user: UserDummy = (jsonParser.createClassInstance(className, filtered)).asInstanceOf[UserDummy]
+        assertNotNull("User could not be instantiated", user)
+    }
+
+    @Test
     def assignValues {
         val user: UserDummy = (jsonParser.createClassInstance(className, jsonObject)).asInstanceOf[UserDummy]
         assertEquals("Johnny", user.name)

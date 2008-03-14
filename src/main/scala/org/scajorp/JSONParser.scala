@@ -3,6 +3,8 @@ package org.scajorp
 import java.lang.reflect.Method
 import scala.collection.mutable
 
+import scala.collection.Map
+
 class JSONParser {
 
   def createClassInstance(className: String, fields: Map[String, Any]) = {
