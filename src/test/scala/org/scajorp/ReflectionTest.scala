@@ -57,7 +57,6 @@ class ReflectionTest {
         }
     }
 
-    // throws NoSuchElementException error
     @Test
     def assignPrivateValues() {
           jsonObject += ("loverCount" -> 20)
@@ -67,14 +66,14 @@ class ReflectionTest {
         }
     }
 
-//    @Test
-//    def assignNonExistingValue {
-//            jsonObject += ("nonExistingField" -> 99)
-//            jsonParser.resolve(jsonObject) match {
-//                case Some(user) => assertNotNull("Error while creating user occurred", user)
-//                case None => fail("Resolving error")
-//        }
-//    }
+    @Test
+    def assignNonExistingValue() {
+            jsonObject += ("nonExistingField" -> 99)
+            jsonParser.resolve(jsonObject) match {
+                case Some(user) => assertNotNull("Error while creating user occurred", user)
+                case None => fail("Resolving error")
+        }
+    }
 
 
 
