@@ -1,7 +1,6 @@
 package org.scajorp
 
 import java.lang.reflect.Method
-import scala.collection.mutable
 
 import scala.collection.Map
 
@@ -24,11 +23,9 @@ class JSONParser {
 
         for( (jsonFieldName, value) <- jsonFields)
             {
-                setterFields(jsonFieldName) match {
-                    //weird, does not allow me to add  case Some(method) or case _  -> unreachable code
-                    //also I thought map(something) returns an option, but does not really in this case?
-                    case method => method.invoke(instance, Array(value.asInstanceOf[Object]))
-
+                setterFields.get(jsonFieldName) match {
+                    case Some(method) => method.invoke(instance, Array(value.asInstanceOf[Object]))
+                    case None => format("No such method name: {0}", jsonFieldName)
                   }
             }
         Some(instance)    
@@ -54,27 +51,28 @@ class JSONParser {
     *
     **/
   private def createPublicSetterFields(cls: Class[_ <: Any]): Map[String, Method] = {
-
-        val result = mutable.Map.empty[String, Method]
-
+        import scala.collection.immutable.Map
+  
         val methods = cls.getMethods()
 
-        for (method <- methods) {
-
+        methods.foldLeft(Map.empty[String, Method])({(resultMap, method) =>
             val name = method.getName
             
             // Scala style setter check
             if (name.lastIndexOf("_$eq") == name.length - 4) {
-                result += (name.substring(0,name.lastIndexOf("_$eq")) -> method)
-
+              resultMap + Pair(name.substring(0,name.lastIndexOf("_$eq")),method)
             }
+ 
             // Java style setter check
             else if (name.startsWith("set")) {
-                result += (name.substring(3).toLowerCase -> method)
-            }
-        }
+              resultMap + Pair(name.substring(3).toLowerCase,method)
+            } 
 
-       result
+            // failure, just pass through
+            else {
+              resultMap
+            }
+        })
     }
 
 
