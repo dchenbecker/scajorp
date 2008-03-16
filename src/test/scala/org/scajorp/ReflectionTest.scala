@@ -12,7 +12,7 @@ class ReflectionTest {
     var jsonObject: Map[String, Any] = _
 
 
-    val className = "org.scajorp.UserDummy"
+    //val className = "org.scajorp.UserDummy"
 
     @Before
     def setUp():Unit = {
@@ -23,37 +23,61 @@ class ReflectionTest {
     }
 
 
+
     @Test
-    def createClassInstance() {
-        val filtered = jsonObject.filterKeys(_ != "jsonClass")
-        val user: UserDummy = (jsonParser.createClassInstance(className, filtered)).asInstanceOf[UserDummy]
-        assertNotNull("Error while creating user occurred", user)
+    def resolveObject() {
+        jsonParser.resolve(jsonObject) match {
+            case Some(user) => assertNotNull("Error while creating user occurred", user)
+            case None => fail("Resolving error")
+        }
+    }
+
+
+    @Test
+    def assignBooleanValue() {
+            jsonParser.resolve(jsonObject) match {
+                case Some(user) => assertEquals(true, user.asInstanceOf[UserDummy].married)
+                case None => fail("Resolving error")
+        }
     }
 
     @Test
-    def assignValues() {
-        val filtered = jsonObject.filterKeys(_ != "jsonClass")
-        val user: UserDummy = (jsonParser.createClassInstance(className, filtered)).asInstanceOf[UserDummy]
-        assertEquals("Johnny", user.name)
-        assertEquals(99, user.getAge)
-        assertEquals(true, user.married)
-    }
-    
-    @Test
-    def assignNonExistingValues() {
-        val filtered = jsonObject.filterKeys(_ != "jsonClass")
-        jsonObject += ("nonExistingField" -> 99)
-        val user: UserDummy = (jsonParser.createClassInstance(className, filtered)).asInstanceOf[UserDummy]
-        assertNotNull("Error while creating user occurred", user)
+    def assignIntegerValue() {
+            jsonParser.resolve(jsonObject) match {
+                case Some(user) => assertEquals(99, user.asInstanceOf[UserDummy].getAge)
+                case None => fail("Resolving error")
+        }
     }
 
     @Test
-    def assignProtectedValues() {
-        val filtered = jsonObject.filterKeys(_ != "jsonClass")
-        jsonObject += ("loverCount" -> 20)
-        val user: UserDummy = (jsonParser.createClassInstance(className, filtered)).asInstanceOf[UserDummy]
-        assertEquals(5, user.getLoverCount())
+    def assignStringValue() {
+            jsonParser.resolve(jsonObject) match {
+                case Some(user) => assertEquals("Johnny", user.asInstanceOf[UserDummy].name)
+                case None => fail("Resolving error")
+        }
     }
+
+    // throws NoSuchElementException error
+    @Test
+    def assignPrivateValues() {
+          jsonObject += ("loverCount" -> 20)
+          jsonParser.resolve(jsonObject) match {
+                case Some(user) => assertEquals(5, user.asInstanceOf[UserDummy].getLoverCount)
+                case None => fail("Resolving error")
+        }
+    }
+
+//    @Test
+//    def assignNonExistingValue {
+//            jsonObject += ("nonExistingField" -> 99)
+//            jsonParser.resolve(jsonObject) match {
+//                case Some(user) => assertNotNull("Error while creating user occurred", user)
+//                case None => fail("Resolving error")
+//        }
+//    }
+
+
+
 
                 
 }

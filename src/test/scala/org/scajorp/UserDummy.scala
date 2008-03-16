@@ -15,7 +15,7 @@ class UserDummy() {
 
     def age_=(a:Int) {age = a}
     
-    protected def loverCount_=(c:Int) { loverCount = c }
+    private def loverCount_=(c:Int) { loverCount = c }
     
     def getLoverCount() = loverCount
 
