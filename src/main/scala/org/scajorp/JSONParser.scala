@@ -6,6 +6,15 @@ import scala.collection.Map
 
 class JSONParser {
 
+  /**
+   * Takes the given map representing a JSON Object and uses the map attributes to instantiate
+   * an object of the correct type (specified by the "jsonClass" key).
+   * 
+   * @param jsonObject The map containing the jsonClass mapping along with mappings for each property of the
+   * 	class to be instantiated.
+   * 
+   * @return The instantiated class or None if the class was not instantiable.
+  */
   def resolve(jsonObject: Map[String, Any]): Option[Object] = jsonObject.get("jsonClass") match {
         case Some(className: String) => createClassInstance(className, jsonObject.filterKeys(_ != "jsonClass"))
         case None => None
@@ -20,16 +29,50 @@ class JSONParser {
 
         jsonFields.keys.foreach(fieldName => setterFields.get(fieldName) match {
           case Some(method) => {
-            val arg : Object = jsonFields(fieldName) match {
+            jsonFields(fieldName) match {
               // Handle nested objects. What to do if it doesn't resolve?
-              case obj : Map[String,Any] => resolve(obj).get
-              // Handle nested arrays
-              case array : List[Any] => array.toArray
+              case obj : Map[String,Any] => method.invoke(instance, Array(resolve(obj).get))
+              // Handle nested arrays in a type-correct manner
+              case array : List[Any] => method.getParameterTypes()(0).getSimpleName match {
+                // Integral types
+                case "byte[]" => {
+                  val arg : Array[Byte] = array.asInstanceOf[List[Double]].map(_.toByte).toArray
+                  method.invoke(instance, Array(arg))
+                }
+                case "short[]" => {
+                  val arg : Array[Short] = array.asInstanceOf[List[Double]].map(_.toShort).toArray
+                  method.invoke(instance, Array(arg))
+                }
+                case "int[]" => {
+                  val arg : Array[Int] = array.asInstanceOf[List[Double]].map(_.toInt).toArray
+                  method.invoke(instance, Array(arg))
+                }
+                case "long[]" => {
+                  val arg : Array[Long] = array.asInstanceOf[List[Double]].map(_.toLong).toArray
+                  method.invoke(instance, Array(arg))
+                }
+                // Float type
+                case "float[]" => {
+                  val arg : Array[Float] = array.asInstanceOf[List[Double]].map(_.toFloat).toArray
+                  method.invoke(instance, Array(arg))
+                }
+                case "double[]" => {
+                  val arg : Array[Double] = array.asInstanceOf[List[Double]].toArray
+                  method.invoke(instance, Array(arg))
+                }
+                // Char type
+                case "char[]" => {
+                  val arg : Array[Char] = array.asInstanceOf[List[String]].map(_.charAt(0)).toArray
+                  method.invoke(instance, Array(arg))
+                }
+                case "string[]" => {
+                  val arg : Array[String] = array.asInstanceOf[List[String]].toArray
+                  method.invoke(instance, Array(arg))
+                }
+              }
               // Handle simple values
-              case value : Object => value
+              case value : Object => method.invoke(instance, Array(value))
             }
-
-            method.invoke(instance, Array(arg))
           }
           case None => format("No such method name: {0}", fieldName)
         })
@@ -40,7 +83,11 @@ class JSONParser {
         // or is there gonna be e.g. a log message
     catch {
         case cnf : ClassNotFoundException => throw cnf
-        case genericError: Throwable => println(genericError); None;
+        case genericError: Throwable => {
+          println(genericError)
+          //genericError.printStackTrace()
+          None
+        }
     }
 
 
@@ -65,7 +112,7 @@ class JSONParser {
             val name = method.getName
 
             // Scala style setter check
-            if (name.lastIndexOf("_$eq") == name.length - 4) {
+            if (name.endsWith("_$eq")) {
               resultMap + Pair(name.substring(0,name.lastIndexOf("_$eq")),method)
             }
 
@@ -80,9 +127,4 @@ class JSONParser {
             }
         })
     }
-
-
-
-
-
 }

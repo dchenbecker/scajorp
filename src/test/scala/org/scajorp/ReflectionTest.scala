@@ -75,8 +75,35 @@ class ReflectionTest {
         }
     }
 
+    @Test
+    def assignNestedObject() {
+      val addressMap = Map("jsonClass" -> "org.scajorp.AddressDummy",
+                           "street" -> "123 Nowhere Lane",
+                           "city" -> "Nowheretown",
+                           "state" -> "Nothing",
+                           "zip" -> "12345")
+      jsonObject += ("address" -> addressMap)
+      //println("User = " + jsonObject)
+      jsonParser.resolve(jsonObject) match {
+        case Some(user : UserDummy) => {
+          assertNotNull("Error resolving nested object", user.address)
+          assertEquals("12345", user.address.zip)
+        }
+        case None => fail("Resolving nested object")
+      }
+    }
 
-
-
-                
+    @Test
+    def assignNestedIntArray() {
+      val luckyNumbersMap = List[Double](11, 42, 1776)
+      jsonObject += ("luckyNumbers" -> luckyNumbersMap)
+      println("User = " + jsonObject)
+      jsonParser.resolve(jsonObject) match {
+        case Some(user : UserDummy) => {
+          assertNotNull("Error resolving nested array", user.luckyNumbers)
+          assertEquals(3, user.luckyNumbers.size)
+        }
+        case None => fail("Resolving nested object")
+      }
+    }             
 }

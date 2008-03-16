@@ -6,6 +6,10 @@ class UserDummy() {
 
     var married: Boolean = _
 
+    var address: AddressDummy = _
+
+    var luckyNumbers : Array[Int] = _
+
     private[this] var age = 0
 
     private[this] var loverCount = 5
