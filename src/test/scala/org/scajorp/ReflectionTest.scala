@@ -97,7 +97,7 @@ class ReflectionTest {
     def assignNestedIntArray() {
       val luckyNumbersMap = List[Double](11, 42, 1776)
       jsonObject += ("luckyNumbers" -> luckyNumbersMap)
-      println("User = " + jsonObject)
+      //println("User = " + jsonObject)
       jsonParser.resolve(jsonObject) match {
         case Some(user : UserDummy) => {
           assertNotNull("Error resolving nested array", user.luckyNumbers)

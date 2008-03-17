@@ -74,7 +74,7 @@ class JSONParser {
               case value : Object => method.invoke(instance, Array(value))
             }
           }
-          case None => format("No such method name: {0}", fieldName)
+          case None => format("No such method name: {0}\n", fieldName)
         })
 
         Some(instance)
