@@ -10,6 +10,20 @@ class UserDummy() {
 
     var luckyNumbers : Array[Int] = _
 
+    var favoriteBytes : Array[Byte] = _
+
+    var favoriteShorts : Array[Short] = _
+
+    var favoriteLongs : Array[Long] = _
+
+    var favoriteFloats : Array[Float] = _
+
+    var favoriteDoubles : Array[Double] = _
+
+    var favoriteChars : Array[Char] = _
+
+    var favoriteStrings : Array[String] = _
+
     private[this] var age = 0
 
     private[this] var loverCount = 5

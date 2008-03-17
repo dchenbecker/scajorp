@@ -65,7 +65,7 @@ class JSONParser {
                   val arg : Array[Char] = array.asInstanceOf[List[String]].map(_.charAt(0)).toArray
                   method.invoke(instance, Array(arg))
                 }
-                case "string[]" => {
+                case "String[]" => {
                   val arg : Array[String] = array.asInstanceOf[List[String]].toArray
                   method.invoke(instance, Array(arg))
                 }
