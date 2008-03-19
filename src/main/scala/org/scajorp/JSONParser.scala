@@ -17,7 +17,7 @@ class JSONParser {
   */
   def resolve(jsonObject: Map[String, Any]): Option[Object] = jsonObject.get("jsonClass") match {
         case Some(className: String) => createClassInstance(className, jsonObject.filterKeys(_ != "jsonClass"))
-        case None => None
+        case _ => None
   }
 
   def createClassInstance(className: String, jsonFields: Map[String, Any]): Option[Object] = {
