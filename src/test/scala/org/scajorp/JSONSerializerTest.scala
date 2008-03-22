@@ -8,9 +8,33 @@ import org.junit.Assert._
 
 class SerializationTest {
 
+     val jsonSerializer = new JSONSerializer
 
-  /*  @Test
-    def simpleValueObject() {
+    var address: AddressDummy = _
+
+   @Before
+    def setUp():Unit = {
+        address = new AddressDummy
+        address.street = "Mulholland Drive"
+        address.city = "Los Angeles"
+        address.state = "CA"
+        address.zip = "12345"
+    }
+
+
+    @Test
+    def simpleValueObject_Strings() {
+        val result = jsonSerializer.serialize(address);
+        assertEquals("{\"street\":\"Mulholland Drive\",\"city\":\"Los Angeles\",\"state\":\"CA\",\"zip\":\"12345\"}", result)
+
+    }
+
+/*
+
+    @Test
+    def simpleValueObject_AnyVal() {
+        val result = jsonSerializer.serialize(address);
+        assertEquals("{\"street\":\"Mulholland Drive\",\"city\":\"Los Angeles\",\"state\":\"CA\",\"zip\":\"12345\"}", result)
 
     }
 
