@@ -6,7 +6,7 @@ import org.junit.Before
 import org.junit.After
 import org.junit.Assert._
 
-class SerializationTest {
+class JSONSerializerTest {
 
      val jsonSerializer = new JSONSerializer
 
