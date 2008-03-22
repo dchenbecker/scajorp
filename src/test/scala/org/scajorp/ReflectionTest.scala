@@ -23,6 +23,7 @@ class ReflectionTest {
     }
 
 
+    /* ------  Construction Test(s) ----- */ 
 
     @Test
     def resolveObject() {
@@ -32,6 +33,8 @@ class ReflectionTest {
         }
     }
 
+
+    /* ------ Primitive Types Test(s) ------ */
 
     @Test
     def assignBooleanValue() {
@@ -74,6 +77,9 @@ class ReflectionTest {
                 case None => fail("Resolving error")
         }
     }
+
+
+     /* ------ Nested Types Test(s) ------ */
 
     @Test
     def assignNestedObject() {
