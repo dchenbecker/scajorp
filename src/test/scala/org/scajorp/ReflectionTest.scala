@@ -7,20 +7,32 @@ import org.junit.Assert._
 
 class ReflectionTest {
 
-    @Test
-    def getReturnType() {
-        // TODO
+    val javaUser = new JavaUserDummy
+    val cls = classOf[JavaUserDummy]
+
+
+
+
+   @Test
+   def getClassName() {   
+        assertEquals("org.scajorp.JavaUserDummy", cls.getName())
     }
 
+//    @Test
+//    def getJavaVoidReturnType() {
+//        val method = cls.  get
+//
+//    }
 
-    @Test
-    def getParameterTypes() {
-        // TODO
-    }
 
-
-    @Test
-    def getModifiers() {
-        // TODO
-    }
+//    @Test
+//    def getParameterTypes() {
+//        // TODO
+//    }
+//
+//
+//    @Test
+//    def getModifiers() {
+//        // TODO
+//    }
 }
