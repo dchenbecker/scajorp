@@ -47,13 +47,23 @@ class ReflectionTest {
 
 
 
-   @Test
-   def getAllScalaMethods() {
-         val methods = scalaClass.getMethods()
-         methods.foreach(method => println(method))
-    }
+//   @Test
+//   def getAllScalaMethods() {
+//         val methods = scalaClass.getMethods()
+//         methods.foreach(method => println(method))
+//    }
 
-
+  @Test
+  def getMethods() {
+      val methods = javaClass.getMethods;
+      assertEquals(15, methods.size)
+  }
+  
+@Test
+def getMethods_filtered() {
+    val methods = javaClass.getMethods.filter(method => method.getDeclaringClass != classOf[AnyRef])
+      assertEquals(6, methods.size)
+}
 
    @Test
    def getScalaMethod() {

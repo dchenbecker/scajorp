@@ -2,48 +2,33 @@ package org.scajorp
 
 import java.lang.reflect.Method
 import scala.collection.Map
+import scala.StringBuilder
 
 class JSONSerializer {
-  def serialize(obj : _<:Any):String = {
-  
-   // val getters = createPublicGetterFields(scalaClass)
-    "{not yet implemented}"
-  //  "{\"street\":\"Mulholland Drive\",\"city\":\"Los Angeles\",\"state\":\"CA\",\"zip\":\"12345\"}"
-  }
-
-
-   // TODO not yet working
- /* private def createPublicGetterFields(obj: _ <:Any): Map[String, Method] = {
-          
-        var jsonString = "{"
+    
+    def serialize(obj :AnyRef):String = { 
+      
+        var methods = obj.getClass.getMethods
+                          .toList
         
-        val methods = cls.getMethods()
+        methods = methods.filter(method => method.getDeclaringClass != classOf[AnyRef]
+                                 && !method.getName.equals("$tag")
+                                 && !method.getName.endsWith("_$eq"));
+        methods = methods.sort((s,t) => s.getName.charAt(0).toLowerCase <                                
+                               t.getName.charAt(0).toLowerCase);
+        val builder = new StringBuilder;
+    
+        builder.append("{")    
+        methods.foreach(method =>  builder.append(buildJSONPair(obj, method)).append(","));       
+        builder.deleteCharAt(builder.length -1);
+        builder.append("}");    
+        builder.toString;
+    }
 
-        for( method <- methods)
-        {
-            val name = method.getName()
-            val params = method.getParameterTypes()
 
-            if (params.length == 0) {
-            
-               // Java style getter check
-                if (name.startsWith("get")) {
-                  jsonString = jsonString + name + method.                  
-                }
-                // Scala style getter check
-                else if (!name.endsWith("_$eq") && !name.startsWith("set")) {
-                  resultMap + Pair(name.substring(0,name.lastIndexOf("_$eq")),method)
-                }
-                // failure, just pass through
-                else {
-                  resultMap
-                }
-           }
-            
+    private def buildJSONPair(obj: AnyRef, method: Method) = {           
+        "\"" + method.getName + "\"" + ":\"" + method.invoke(obj, Array()) + "\""
+    }
 
-        }
-        jsonString = jsonString +"}"
-        jsonString
-        } */
     
 }

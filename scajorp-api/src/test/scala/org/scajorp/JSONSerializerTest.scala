@@ -8,54 +8,53 @@ import org.junit.Assert._
 
 class JSONSerializerTest {
 
-     val jsonSerializer = new JSONSerializer
+    val jsonSerializer = new JSONSerializer
 
-    var address: AddressDummy = _
+    var person: PersonDummy = _
 
-   @Before
+    @Before
     def setUp():Unit = {
-        address = new AddressDummy
-        address.street = "Mulholland Drive"
-        address.city = "Los Angeles"
-        address.state = "CA"
-        address.zip = "12345"
+        person = new PersonDummy();        
     }
 
 
     @Test
-    def simpleObject_Strings() {
-        val result = jsonSerializer.serialize(address);
-        assertEquals("{\"street\":\"Mulholland Drive\",\"city\":\"Los Angeles\",\"state\":\"CA\",\"zip\":\"12345\"}", result)
-
-    }
-
-/*
-
-    @Test
-    def simpleValueObject_AnyVal() {
-        val result = jsonSerializer.serialize(address);
-        assertEquals("{\"street\":\"Mulholland Drive\",\"city\":\"Los Angeles\",\"state\":\"CA\",\"zip\":\"12345\"}", result)
-
-    }
-
-    @Test
-    def nestedSimpleValueObjects() {
-
-    }
-
-    @Test
-    def nestedComplexObjects() {
-    
-    }
-
-    @Test
-    def excludingProperties_annotations() {
-
+    def simpleObject_Strings() {        
+        person.firstName = "John"
+        person.lastName = "Rambo"        
+        val result = jsonSerializer.serialize(person);
+        assertEquals("{\"firstName\":\"John\",\"lastName\":\"Rambo\"}", result)
     }
     
-    @Test
-    def excludingProperties_syntax() {
+   
 
-    }*/
+    /*
+
+     @Test
+     def simpleValueObject_AnyVal() {
+     val result = jsonSerializer.serialize(address);
+     assertEquals("{\"street\":\"Mulholland Drive\",\"city\":\"Los Angeles\",\"state\":\"CA\",\"zip\":\"12345\"}", result)
+
+     }
+
+     @Test
+     def nestedSimpleValueObjects() {
+
+     }
+
+     @Test
+     def nestedComplexObjects() {
+    
+     }
+
+     @Test
+     def excludingProperties_annotations() {
+
+     }
+    
+     @Test
+     def excludingProperties_syntax() {
+
+     }*/
 
 }
