@@ -55,7 +55,7 @@ class JSONSerializerTest {
         person.lastName = "Rambo"
         person.married = true        
         val result = jsonSerializer.serialize(person);
-        assertEquals("{\"age\":21,\"firstName\":\"John\",\"lastName\":\"Rambo\",\"married\":true}", result)
+        assertEquals("{\"age\":21,\"firstName\":\"John\",\"lastName\":\"Rambo\",\"married\":true,\"nextAge\":21}", result)
     }
     
     

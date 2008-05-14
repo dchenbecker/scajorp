@@ -15,4 +15,6 @@ class PersonDummy() {
     var age: Integer = _
     
     var married: Boolean = _
+    
+    def getNextAge = age
 }
