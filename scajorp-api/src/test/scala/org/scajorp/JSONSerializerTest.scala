@@ -48,7 +48,7 @@ class JSONSerializerTest {
         assertEquals("{\"jsonClass\":\"org.scajorp.dummies.BooleanDummy\",\"happy\":false,\"sad\":true}", result)
     }
     
-    @Test
+/*    @Test
     def person_allPrimitives() {
         person.age = 21
         person.firstName = "John"
@@ -56,7 +56,7 @@ class JSONSerializerTest {
         person.married = true        
         val result = jsonSerializer.serialize(person);
         assertEquals("{\"jsonClass\":\"org.scajorp.dummies.PersonDummy\",\"age\":21,\"firstName\":\"John\",\"lastName\":\"Rambo\",\"married\":true,\"nextAge\":21}", result)
-    }
+    } */
     
     
    

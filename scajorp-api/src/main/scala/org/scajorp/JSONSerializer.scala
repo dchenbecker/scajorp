@@ -33,34 +33,25 @@ class JSONSerializer {
         !method.getName.endsWith("_$eq")
     }
     
-    /**
-     * Checks if a given method is a Java style getter.
-     */
-    private def isJavaGetter(method: Method): Boolean = {
-        return method.getName().startsWith("get");
-    }
 
+    private def standardisedGetter(method: Method): String = {                
+        val name = method.getName()
+        if (name.startsWith("get")) {
+            name.substring(0,1).toLowerCase() + name.substring(1);            
+        }
+        name
+    }
     /**
      * Compares two names and sorts them ascendingly. Takes into account
      * that a getter name might start with "get".
      */
     private def sortAscending(getter1: Method, getter2: Method): Boolean = {
         
-        val name1 = getter1.getName()
-        val name2 = getter2.getName()
-        
-        if (isJavaGetter(getter1) && isJavaGetter(getter2)) {
-            Character.toLowerCase(name1.charAt(3)) < Character.toLowerCase(name2.charAt(3));
-        }
-        else if (isJavaGetter(getter1) && !isJavaGetter(getter2)) {
-            Character.toLowerCase(name1.charAt(3)) < name2.charAt(0);
-        }
-        else if (!isJavaGetter(getter1) && isJavaGetter(getter2)) {
-            name1.charAt(0) < Character.toLowerCase(name2.charAt(3))
-        }
-        else {
-            name1.charAt(0) < name2.charAt(0);
-        }
+        val name1 = standardisedGetter(getter1)
+        val name2 = standardisedGetter(getter2)
+              
+        name1.charAt(0) < name2.charAt(0);
+      
     }
     
    
@@ -80,15 +71,7 @@ class JSONSerializer {
      */
     private def key(getter: Method): String = {
         val builder = new StringBuilder;
-        builder.append("\"")
-        if (isJavaGetter(getter)) {
-            builder.append(getter.getName().substring(3));
-            builder.setCharAt(1, Character.toLowerCase(builder.charAt(1)));
-        }
-        else {
-            builder.append(getter.getName());
-        }
-        builder.append("\":")
+        builder.append("\"").append(standardisedGetter(getter)).append("\":")                   
         builder.toString()
     }
 
