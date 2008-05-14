@@ -34,12 +34,13 @@ class JSONSerializer {
     }
     
 
-    private def standardisedGetter(method: Method): String = {                
-        val name = method.getName()
-        if (name.startsWith("get")) {
-            name.substring(0,1).toLowerCase() + name.substring(1);            
+    private def standardisedGetter(method: Method): String = {   
+        
+        var name = method.getName()        
+        if (name.startsWith("get")) {                
+            name.substring(3,4).toLowerCase() + name.substring(4)           
         }
-        name
+        else name
     }
     /**
      * Compares two names and sorts them ascendingly. Takes into account
