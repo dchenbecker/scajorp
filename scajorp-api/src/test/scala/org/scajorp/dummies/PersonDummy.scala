@@ -8,7 +8,11 @@
 package org.scajorp
 
 class PersonDummy() {
-  var firstName: String = _
+    var firstName: String = _
   
     var lastName: String = _
+    
+    var age: Integer = _
+    
+    var married: Boolean = _
 }

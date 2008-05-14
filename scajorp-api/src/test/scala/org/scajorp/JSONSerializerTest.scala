@@ -5,26 +5,59 @@ import org.junit.Test
 import org.junit.Before
 import org.junit.After
 import org.junit.Assert._
+import org.scajorp.dummies._
 
 class JSONSerializerTest {
 
     val jsonSerializer = new JSONSerializer
 
-    var person: PersonDummy = _
+    var stringDummy: StringDummy = new StringDummy()
+    
+    var integerDummy: IntegerDummy = new IntegerDummy()
+    
+    var booleanDummy: BooleanDummy = new BooleanDummy()
+    
+    var person: PersonDummy = new PersonDummy()
 
     @Before
     def setUp():Unit = {
-        person = new PersonDummy();        
+        
     }
 
 
     @Test
-    def simpleObject_Strings() {        
-        person.firstName = "John"
-        person.lastName = "Rambo"        
-        val result = jsonSerializer.serialize(person);
+    def stringObject() {        
+        stringDummy.firstName = "John"
+        stringDummy.lastName = "Rambo"        
+        val result = jsonSerializer.serialize(stringDummy);
         assertEquals("{\"firstName\":\"John\",\"lastName\":\"Rambo\"}", result)
     }
+    
+    @Test
+    def integerObject() {
+        integerDummy.age = 21
+        val result = jsonSerializer.serialize(integerDummy);
+        assertEquals("{\"age\":21}", result)
+    }
+    
+    @Test
+    def booleanObject() {
+        booleanDummy.sad = true
+        booleanDummy.happy = false
+        val result = jsonSerializer.serialize(booleanDummy);
+        assertEquals("{\"happy\":false,\"sad\":true}", result)
+    }
+    
+    @Test
+    def person_allPrimitives() {
+        person.age = 21
+        person.firstName = "John"
+        person.lastName = "Rambo"
+        person.married = true        
+        val result = jsonSerializer.serialize(person);
+        assertEquals("{\"age\":21,\"firstName\":\"John\",\"lastName\":\"Rambo\",\"married\":true}", result)
+    }
+    
     
    
 

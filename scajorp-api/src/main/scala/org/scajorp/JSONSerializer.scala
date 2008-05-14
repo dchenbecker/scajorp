@@ -32,9 +32,22 @@ class JSONSerializer {
     }
 
 
-    private def buildJSONPair(obj: AnyRef, method: Method) = {           
-        "\"" + method.getName + "\"" + ":\"" + method.invoke(obj, Array()) + "\""
+    private def buildJSONPair(obj: AnyRef, method: Method) = {                               
+      key(method) + value(obj, method);      
     }
+    
+   private def key(method: Method) = "\"" + method.getName + "\":"
+         
+   private def value(obj: AnyRef, method: Method) = {
+       
+      val methodResult = method.invoke(obj, Array())
+        methodResult match {
+          case (s: String) => "\"" + s + "\""
+          case _ => methodResult 
+      }
+   }
+   
+   
 
     
 }
