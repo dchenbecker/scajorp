@@ -5,7 +5,7 @@
  * and open the template in the editor.
  */
 
-package org.scajorp
+package org.scajorp.dummies
 
 class PersonDummy() {
     var firstName: String = _

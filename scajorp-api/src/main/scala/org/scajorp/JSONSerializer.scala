@@ -18,7 +18,8 @@ class JSONSerializer {
 
     private def toJson(obj: AnyRef, methods: List[Method]): String = {
         val builder = new StringBuilder;
-        builder.append("{")
+        builder.append("{\"jsonClass\":\"").append(obj.getClass().getName()).append("\",")
+        
         methods.foreach(method =>  builder.append(buildJSONPair(obj, method)).append(","));
         builder.deleteCharAt(builder.length -1).append("}").toString;
     }
