@@ -11,7 +11,7 @@ class JSONSerializer {
         val getters = obj.getClass
         .getMethods.toList
         .filter(method => isGetter(method))
-        .sort((s,t) => sortAscending(s.getName(), t.getName()))
+        .sort((s,t) => sortAscending(s, t))
         toJson(obj, getters);
 
     }
@@ -24,32 +24,45 @@ class JSONSerializer {
     }
 
     /**
-     * Checks if a given method is a getter.
+     * Checks if a given method is a Scala- OR Java style getter.
      */
     private def isGetter(method: Method): Boolean = {
         method.getDeclaringClass != classOf[AnyRef] &&
         !method.getName.equals("$tag") &&
         !method.getName.endsWith("_$eq")
     }
+    
+    /**
+     * Checks if a given method is a Java style getter.
+     */
+    private def isJavaGetter(method: Method): Boolean = {
+        return method.getName().startsWith("get");
+    }
 
     /**
      * Compares two names and sorts them ascendingly. Takes into account
      * that a getter name might start with "get".
      */
-    private def sortAscending(name1: String, name2: String): Boolean = {
-        if (name1.startsWith("get") && name2.startsWith("get")) {
+    private def sortAscending(getter1: Method, getter2: Method): Boolean = {
+        
+        val name1 = getter1.getName()
+        val name2 = getter2.getName()
+        
+        if (isJavaGetter(getter1) && isJavaGetter(getter2)) {
             Character.toLowerCase(name1.charAt(3)) < Character.toLowerCase(name2.charAt(3));
         }
-        else if (name1.startsWith("get") && !name2.startsWith("get")) {
+        else if (isJavaGetter(getter1) && !isJavaGetter(getter2)) {
             Character.toLowerCase(name1.charAt(3)) < name2.charAt(0);
         }
-        else if (!name1.startsWith("get") && name2.startsWith("get")) {
+        else if (!isJavaGetter(getter1) && isJavaGetter(getter2)) {
             name1.charAt(0) < Character.toLowerCase(name2.charAt(3))
         }
         else {
             name1.charAt(0) < name2.charAt(0);
         }
     }
+    
+   
 
     /**
      * Creates a json pair from a getter method and its return value.
@@ -67,10 +80,9 @@ class JSONSerializer {
     private def key(getter: Method): String = {
         val builder = new StringBuilder;
         builder.append("\"")
-        if (getter.getName().startsWith("get")) {
+        if (isJavaGetter(getter)) {
             builder.append(getter.getName().substring(3));
             builder.setCharAt(1, Character.toLowerCase(builder.charAt(1)));
-
         }
         else {
             builder.append(getter.getName());
