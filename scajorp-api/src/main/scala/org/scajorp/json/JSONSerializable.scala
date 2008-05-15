@@ -1,18 +1,11 @@
-/*
- * JSONSerializable.scala
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
-
 package org.scajorp.json 
 
 trait JSONSerializable {
     
-    val opening: String
-    val closing: String
+    val opening_literal: String
+    val closing_literal: String
     
-    protected val builder = new StringBuilder
+    private val builder = new StringBuilder
     
     override def toString() = {  
         resetBuilder()
@@ -22,7 +15,7 @@ trait JSONSerializable {
     /**
      * Resets this object's StringBuilder    
      */
-    protected def resetBuilder() {        
+    private def resetBuilder() {        
         if (builder.length() > 1) builder.delete(0, builder.length() - 1)        
     }
 
@@ -36,22 +29,43 @@ trait JSONSerializable {
         }
     }
     
-    protected def appendComma() {
+
+    def createJSONPair(key: String, value: Any) {
+            appendValue(key);
+            appendSeparator()
+            appendValue(value)            
+            appendComma()
+    }
+    
+    def createArrayValue(value: Any) {
+         appendValue(value);
+         appendComma()
+    }
+
+    private def appendComma() {
         builder.append(",")
     }
     
-    protected def appendSeparator() {
+    private def appendSeparator() {
         builder.append(":")
     }
 
-    protected def appendOpening() {
-        builder.append(opening)
+    private def appendOpening() {
+        builder.append(opening_literal)
     }
     
-    protected def appendClosing() {
-        builder.deleteCharAt(builder.length -1).append(closing)
+    private def appendClosing() {
+        builder.deleteCharAt(builder.length -1).append(closing_literal)
     }
-  
+      
+    private def serialize():String = {
+        appendOpening()       
+        process()
+        appendClosing()
+        builder.toString()
+    }
+      
+    protected def process(): Unit
+
     
-    protected def serialize(): String
 }

@@ -1,35 +1,21 @@
-/*
- * JSONObject.scala
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
-
 package org.scajorp.json
 import scala.collection.mutable.HashMap
 
+/**
+* Scala representation of a JSONObject. JSONObject is simply a HashMap
+* that knows how to turn itself into a JSON String via the capabilities
+* offered by trait JSONSerializable. Is not yet secured against circular dependencies.
+* 
+*  @author Marco Behler 
+*/
 class JSONObject extends HashMap[String,Any] with JSONSerializable{
        
-    val opening = "{"
-    val closing = "}"
-    
-    override protected def serialize():String = {
-        appendOpening()       
-        appendPairs()
-        appendClosing()
-        builder.toString()
-    }
-
-    
-    private def appendPairs() {
-        def appendKey(key: String) {        
-            builder.append("\"").append(key).append("\"")                
-        }
+    val opening_literal = "{"
+    val closing_literal = "}"
+     
+    override protected def process() {        
         for((key,value) <- this) {
-            appendKey(key)
-            appendSeparator()
-            appendValue(value)            
-            appendComma()
+            createJSONPair(key, value)
         }   
     }
    
