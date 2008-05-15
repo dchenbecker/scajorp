@@ -5,7 +5,7 @@ import scala.collection.Map
 import scala.StringBuilder
 
 class JSONSerializer {
-
+   
     def serialize(obj :AnyRef):String = {
 
         val getters = obj.getClass
