@@ -9,6 +9,9 @@ package org.scajorp.json
 
 trait JSONSerializable {
     
+    val opening: String
+    val closing: String
+    
     protected val builder = new StringBuilder
     
     override def toString() = {  
@@ -19,12 +22,12 @@ trait JSONSerializable {
     /**
      * Resets this object's StringBuilder    
      */
-    def resetBuilder() {        
+    protected def resetBuilder() {        
         if (builder.length() > 1) builder.delete(0, builder.length() - 1)        
     }
 
     
-    def appendValue(obj: Any) = {
+    protected def appendValue(obj: Any) = {
         obj match {
             case (s: String) => builder.append("\"").append(s).append("\"")
             case (jsonObj : JSONObject) => builder.append(jsonObj.toString())
@@ -33,14 +36,21 @@ trait JSONSerializable {
         }
     }
     
-    def appendComma() {
+    protected def appendComma() {
         builder.append(",")
     }
     
-   protected def appendSeparator() {
+    protected def appendSeparator() {
         builder.append(":")
     }
 
+    protected def appendOpening() {
+        builder.append(opening)
+    }
+    
+    protected def appendClosing() {
+        builder.deleteCharAt(builder.length -1).append(closing)
+    }
   
     
     protected def serialize(): String
