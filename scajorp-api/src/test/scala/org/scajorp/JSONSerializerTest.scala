@@ -30,7 +30,7 @@ class JSONSerializerTest {
         stringDummy.firstName = "John"
         stringDummy.lastName = "Rambo"        
         val result = jsonSerializer.serialize(stringDummy);
-        assertEquals("{\"jsonClass\":\"org.scajorp.dummies.StringDummy\",\"firstName\":\"John\",\"lastName\":\"Rambo\"}", result)
+        assertEquals("{\"firstName\":\"John\",\"jsonClass\":\"org.scajorp.dummies.StringDummy\",\"lastName\":\"Rambo\"}", result)
     }
     
     @Test
@@ -45,7 +45,7 @@ class JSONSerializerTest {
         booleanDummy.sad = true
         booleanDummy.happy = false
         val result = jsonSerializer.serialize(booleanDummy);
-        assertEquals("{\"sad\":true,\"jsonClass\":\"org.scajorp.dummies.BooleanDummy\",\"happy\":false}", result)
+        assertEquals("{\"happy\":false,\"jsonClass\":\"org.scajorp.dummies.BooleanDummy\",\"sad\":true}", result)
     }
     
     @Test
@@ -55,7 +55,7 @@ class JSONSerializerTest {
         person.lastName = "Rambo"
         person.married = true        
         val result = jsonSerializer.serialize(person);
-        assertEquals("{\"married\":true,\"age\":21,\"jsonClass\":\"org.scajorp.dummies.PersonDummy\",\"firstName\":\"John\",\"lastName\":\"Rambo\"}", result)
+        assertEquals("{\"age\":21,\"firstName\":\"John\",\"jsonClass\":\"org.scajorp.dummies.PersonDummy\",\"lastName\":\"Rambo\",\"married\":true}", result)
     } 
     
     

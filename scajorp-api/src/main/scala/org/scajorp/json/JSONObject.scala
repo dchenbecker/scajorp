@@ -1,5 +1,5 @@
 package org.scajorp.json
-import scala.collection.mutable.HashMap
+import scala.collection.jcl.TreeMap
 
 /**
 * Scala representation of a JSONObject. JSONObject is simply a HashMap
@@ -10,7 +10,7 @@ import scala.collection.mutable.HashMap
 * 
 * @author Marco Behler 
 */
-class JSONObject extends HashMap[String,Any] with JSONSerializable{
+class JSONObject extends TreeMap[String,Any] with JSONSerializable{
        
     val opening_literal = "{"
     val closing_literal = "}"

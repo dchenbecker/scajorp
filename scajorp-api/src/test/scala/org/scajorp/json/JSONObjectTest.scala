@@ -29,7 +29,7 @@ class JSONObjectTest {
         jsonObject += ("gender" -> "male")
         jsonObject += ("tall" -> "yes")
         val result = jsonObject.toString()
-        assertEquals("{\"gender\":\"male\",\"tall\":\"yes\",\"name\":\"Johnny\"}", result)                
+        assertEquals("{\"gender\":\"male\",\"name\":\"Johnny\",\"tall\":\"yes\"}", result)                
     }
     
     @Test
@@ -40,7 +40,7 @@ class JSONObjectTest {
         jsonObject += ("tall" -> true)
         jsonObject += ("mutti" -> null)
         val result = jsonObject.toString()
-        assertEquals("{\"age\":21,\"mutti\":null,\"tall\":true,\"name\":\"Johnny\"}", result)                
+        assertEquals("{\"age\":21,\"mutti\":null,\"name\":\"Johnny\",\"tall\":true}", result)                
     }
     
     @Test

@@ -22,7 +22,7 @@ class JSONSerializer {
         .sort((s,t) => sortAscending(s, t))
         toJson(obj, getters); */
     
-    private def createJSONObject(obj: AnyRef) = {
+    private def createJSONObject(obj: AnyRef): JSONObject = {
         
         val jsonObj = new JSONObject        
         jsonObj += ("jsonClass" -> obj.getClass().getName())
@@ -34,7 +34,9 @@ class JSONSerializer {
         fields.foreach(field => doIt(field))
         jsonObj
     }
+    
 
+    
  /*   private def toJson(obj: AnyRef, methods: List[Method]): String = {
         val builder = new StringBuilder;
         builder.append("{\"jsonClass\":\"").append(obj.getClass().getName()).append("\",")

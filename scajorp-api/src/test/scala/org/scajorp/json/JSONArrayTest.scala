@@ -38,7 +38,7 @@ class JSONArrayTest {
         
         
         val result = jsonObject.toString()
-        assertEquals("{\"gender\":\"male\",\"name\":\"Johnny\",\"array\":[\"Johnny\",21]}", result)
+        assertEquals("{\"array\":[\"Johnny\",21],\"gender\":\"male\",\"name\":\"Johnny\"}", result)
 
     }
 }
