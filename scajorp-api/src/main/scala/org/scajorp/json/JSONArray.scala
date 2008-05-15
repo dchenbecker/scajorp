@@ -17,7 +17,7 @@ class JSONArray extends ArrayList[Any] with JSONSerializable{
     val closing_literal = "]"
                 
     override protected def process() {       
-        foreach(value => appendArrayValue(value))                    
+        this.foreach(value => appendArrayValue(value))                    
     }
     
   

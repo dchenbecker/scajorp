@@ -37,7 +37,7 @@ class JSONSerializerTest {
     def integerObject() {
         integerDummy.age = 21
         val result = jsonSerializer.serialize(integerDummy);
-        assertEquals("{\"jsonClass\":\"org.scajorp.dummies.IntegerDummy\",\"age\":21}", result)
+        assertEquals("{\"age\":21,\"jsonClass\":\"org.scajorp.dummies.IntegerDummy\"}", result)
     }
     
     @Test
@@ -45,7 +45,7 @@ class JSONSerializerTest {
         booleanDummy.sad = true
         booleanDummy.happy = false
         val result = jsonSerializer.serialize(booleanDummy);
-        assertEquals("{\"jsonClass\":\"org.scajorp.dummies.BooleanDummy\",\"happy\":false,\"sad\":true}", result)
+        assertEquals("{\"sad\":true,\"jsonClass\":\"org.scajorp.dummies.BooleanDummy\",\"happy\":false}", result)
     }
     
     @Test
@@ -55,7 +55,7 @@ class JSONSerializerTest {
         person.lastName = "Rambo"
         person.married = true        
         val result = jsonSerializer.serialize(person);
-        assertEquals("{\"jsonClass\":\"org.scajorp.dummies.PersonDummy\",\"age\":21,\"firstName\":\"John\",\"lastName\":\"Rambo\",\"married\":true,\"nextAge\":21}", result)
+        assertEquals("{\"married\":true,\"age\":21,\"jsonClass\":\"org.scajorp.dummies.PersonDummy\",\"firstName\":\"John\",\"lastName\":\"Rambo\"}", result)
     } 
     
     

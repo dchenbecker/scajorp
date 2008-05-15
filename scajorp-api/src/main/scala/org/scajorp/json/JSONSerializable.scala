@@ -52,7 +52,11 @@ trait JSONSerializable {
     }
     
     private def appendClosing() {
-        builder.deleteCharAt(builder.length -1).append(closing_literal)
+        deleteLastComma().append(closing_literal)
+    }
+    
+    private def deleteLastComma() = {
+        builder.deleteCharAt(builder.length -1)        
     }
     
     private def appendValue(obj: Any) = {
