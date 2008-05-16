@@ -1,4 +1,4 @@
-package org.scajorp
+package org.scajorp.json
 
 
 import org.junit.Test

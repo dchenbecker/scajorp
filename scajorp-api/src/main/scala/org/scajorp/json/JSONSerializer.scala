@@ -1,4 +1,4 @@
-package org.scajorp
+package org.scajorp.json
 
 import java.lang.reflect.Method
 import java.lang.reflect.Field
