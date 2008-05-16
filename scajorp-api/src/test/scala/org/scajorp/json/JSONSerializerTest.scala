@@ -16,6 +16,8 @@ class JSONSerializerTest {
     var booleanDummy: BooleanDummy = new BooleanDummy()
     
     var person: PersonDummy = new PersonDummy()
+    
+    val nested = new NestedDummy()
 
     @Before
     def setUp():Unit = {
@@ -56,7 +58,33 @@ class JSONSerializerTest {
         assertEquals("{\"age\":21,\"firstName\":\"John\",\"jsonClass\":\"org.scajorp.dummies.PersonDummy\",\"lastName\":\"Rambo\",\"married\":true}", result)
     } 
     
+    @Test
+    def person_Nested() {
+        val result = JSONSerializer.serialize(nested)
+        println("-----" + result)
+        assertEquals("{\"age\":21,\"jsonClass\":\"org.scajorp.dummies.NestedDummy\",\"name\":\"John\",\"person\":{\"age\":null,\"firstName\":null,\"jsonClass\":\"org.scajorp.dummies.PersonDummy\",\"lastName\":null,\"married\":false}}", result)
+    }
     
+    @Test
+    def array_strings() {
+        val names = Array[String]("John", "Dick","Jack")
+        val result = JSONSerializer.serialize(names)
+        assertEquals("[\"John\",\"Dick\",\"Jack\"]",result)
+    }
+    
+    @Test
+    def array_boolean() {
+        val names = Array[java.lang.Boolean](true, false, true)
+        val result = JSONSerializer.serialize(names)
+        assertEquals("[true,false,true]",result)
+    }
+    
+    @Test
+    def array_integer() {
+        val names = Array[Integer](1,2,3)
+        val result = JSONSerializer.serialize(names)
+        assertEquals("[1,22,3]",result)
+    }
    
 
     /*

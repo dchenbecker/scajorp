@@ -21,7 +21,10 @@ object JSONSerializer {
      * Creates a serialized representation of the given object.
      */
     def serialize(obj :AnyRef):String = {
-        val jsonObj = createJSONObject(obj, None)
+        val jsonObj = obj match {
+            case (s: Seq[_]) => createJSONArray(s, None)
+            case _ => createJSONObject(obj, None)
+        }        
         jsonObj.toString()            
     }
 
@@ -35,23 +38,50 @@ object JSONSerializer {
         jsonObj.toString()
     }
     
-    private def createJSONObject(obj: AnyRef, requestedFields : Option[Set[String]]) : JSONObject = {
-        val jsonObj = new JSONObject        
+      
+    private def addField(field: Field, obj: AnyRef, jsonObj: JSONObject) = {
+         
+        field.setAccessible(true)            
+        val name = field.getName()
+        val value = field.get(obj)            
+        value match {
+            case (s:String) => jsonObj+= (name -> value)
+            case (i:Integer) => jsonObj+= (name -> value)
+            case (l:java.lang.Long) => jsonObj+= (name -> value)
+            case (f:java.lang.Float) => jsonObj+= (name -> value)
+            case (s:java.lang.Short) => jsonObj+= (name -> value)
+            case (b:java.lang.Byte) => jsonObj+= (name -> value)
+            case (b:java.lang.Boolean) => jsonObj+= (name -> value)                                    
+            case null => jsonObj+= (name -> value)                   
+            case obj: AnyRef => jsonObj+= (name -> createJSONObject(obj, None))
+        }
+    }
+
+    private def createJSONObject(obj: AnyRef, requestedFields : Option[Set[String]]): JSONObject= {
+        
+        val jsonObj = new JSONObject                
         jsonObj += ("jsonClass" -> obj.getClass().getName())
 
+        val fields = getFields(obj, requestedFields)
+     
+        fields.foreach(field => addField(field,obj, jsonObj))
+        jsonObj
+    }
+    
+    private def createJSONArray(seq: Seq[_], requestedFields : Option[Set[String]]): JSONArray = {        
+        val jsonArray = new JSONArray                      
+        seq.foreach(field => jsonArray += field)       
+        jsonArray
+    }
+    
+        
+
+    private def getFields(obj: AnyRef, requestedFields : Option[Set[String]]) =  {
         // Either fetch all fields or only those requested
         val fields = requestedFields match {
             case Some(names) => obj.getClass.getDeclaredFields().filter({field => names.contains(field.getName)})
             case None => obj.getClass.getDeclaredFields
         }
-
-        def doIt(field: Field) = {            
-            field.setAccessible(true)
-            jsonObj += (field.getName() -> field.get(obj))
-        }
-
-        fields.foreach(field => doIt(field))
-        jsonObj
+        fields
     }
-    
 }
