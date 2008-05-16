@@ -22,12 +22,23 @@ object JSONSerializer {
      */
     def serialize(obj :AnyRef):String = {
         val jsonObj = obj match {
-            case (s: Seq[_]) => createJSONArray(s, None)
+            case (collection: Collection[_]) => processCollection(collection)
             case _ => createJSONObject(obj, None)
         }        
         jsonObj.toString()            
     }
+    
 
+    private def processCollection(collection: Collection[_]) ={
+        val json = collection match {
+            case (map: Map[String,Any]) => convertMap(map)
+            case _ => createJSONArray(collection, None)
+        }
+        json
+    }
+
+
+    
     /**
      * Creates a serialized representation of the given object, but only for
      * the fields in the requestedFields set. This method exists so that you 
@@ -38,7 +49,8 @@ object JSONSerializer {
         jsonObj.toString()
     }
     
-      
+  
+    
     private def addField(field: Field, obj: AnyRef, jsonObj: JSONObject) = {
          
         field.setAccessible(true)            
@@ -57,8 +69,7 @@ object JSONSerializer {
         }
     }
 
-    private def createJSONObject(obj: AnyRef, requestedFields : Option[Set[String]]): JSONObject= {
-        
+    private def createJSONObject(obj: AnyRef, requestedFields : Option[Set[String]]): JSONObject= {        
         val jsonObj = new JSONObject                
         jsonObj += ("jsonClass" -> obj.getClass().getName())
 
@@ -68,12 +79,20 @@ object JSONSerializer {
         jsonObj
     }
     
-    private def createJSONArray(seq: Seq[_], requestedFields : Option[Set[String]]): JSONArray = {        
-        val jsonArray = new JSONArray                      
-        seq.foreach(field => jsonArray += field)       
+    private def createJSONArray(collection: Collection[_], requestedFields : Option[Set[String]]): JSONArray = {        
+        val jsonArray = new JSONArray                
+        collection.foreach(field => jsonArray += field)       
         jsonArray
     }
     
+    
+    private def convertMap(map: Map[String,Any]): JSONObject = {
+        val jsonObject = new JSONObject
+        for ((key, value) <- map) {
+            jsonObject += (key -> value)
+        }
+        return jsonObject
+    }
         
 
     private def getFields(obj: AnyRef, requestedFields : Option[Set[String]]) =  {

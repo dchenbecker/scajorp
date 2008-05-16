@@ -9,24 +9,21 @@ import org.scajorp.dummies._
 
 class JSONSerializerTest {
 
-    var stringDummy: StringDummy = new StringDummy()
+    var stringDummy = new StringDummy()
     
-    var integerDummy: IntegerDummy = new IntegerDummy()
+    var integerDummy = new IntegerDummy()
     
-    var booleanDummy: BooleanDummy = new BooleanDummy()
+    var booleanDummy = new BooleanDummy()
     
-    var person: PersonDummy = new PersonDummy()
+    var person = new PersonDummy()
     
     val nested = new NestedDummy()
 
-    @Before
-    def setUp():Unit = {
-        
-    }
-
-
+    
+    /* ----- (P)lain (O)ld (S)cala (O)bject tests ----- */
+    
     @Test
-    def stringObject() {        
+    def object_withStrings() {        
         stringDummy.firstName = "John"
         stringDummy.lastName = "Rambo"        
         val result = JSONSerializer.serialize(stringDummy);
@@ -34,14 +31,14 @@ class JSONSerializerTest {
     }
     
     @Test
-    def integerObject() {
+    def object_withIntegers() {
         integerDummy.age = 21
         val result = JSONSerializer.serialize(integerDummy);
         assertEquals("{\"age\":21,\"jsonClass\":\"org.scajorp.dummies.IntegerDummy\"}", result)
     }
     
     @Test
-    def booleanObject() {
+    def object_withBooleans() {
         booleanDummy.sad = true
         booleanDummy.happy = false
         val result = JSONSerializer.serialize(booleanDummy);
@@ -49,7 +46,7 @@ class JSONSerializerTest {
     }
     
     @Test
-    def person_allPrimitives() {
+    def person_poso() {
         person.age = 21
         person.firstName = "John"
         person.lastName = "Rambo"
@@ -59,11 +56,15 @@ class JSONSerializerTest {
     } 
     
     @Test
-    def person_Nested() {
+    def person_posoNested() {
         val result = JSONSerializer.serialize(nested)
         println("-----" + result)
         assertEquals("{\"age\":21,\"jsonClass\":\"org.scajorp.dummies.NestedDummy\",\"name\":\"John\",\"person\":{\"age\":null,\"firstName\":null,\"jsonClass\":\"org.scajorp.dummies.PersonDummy\",\"lastName\":null,\"married\":false}}", result)
     }
+    
+
+
+    /* ----- Collection tests ----- */
     
     @Test
     def array_strings() {
@@ -83,37 +84,48 @@ class JSONSerializerTest {
     def array_integer() {
         val names = Array[Integer](1,2,3)
         val result = JSONSerializer.serialize(names)
-        assertEquals("[1,22,3]",result)
+        assertEquals("[1,2,3]",result)
+    }
+    
+    @Test
+    def list_strings() {
+        val names = Array[String]("John", "Dick","Jack")
+        val result = JSONSerializer.serialize(names)
+        assertEquals("[\"John\",\"Dick\",\"Jack\"]",result)
+    }
+    
+    @Test
+    def list_integer() {
+        val names = Array[Integer](1, 2,3)
+        val result = JSONSerializer.serialize(names)
+        assertEquals("[1,2,3]",result)
+    }
+    
+    @Test
+    def set_strings() {
+        val names = Set[String]("John", "Dick","Jack")
+        val result = JSONSerializer.serialize(names)
+        assertEquals("[\"John\",\"Dick\",\"Jack\"]",result)
+    }
+    
+    @Test
+    def map_strings() {
+        val names = Map[String,String]("first" -> "Rambo", "last" -> "Wayne")
+        val result = JSONSerializer.serialize(names)
+        assertEquals("{\"first\":\"Rambo\",\"last\":\"Wayne\"}",result)
+    }
+    
+    @Test
+    def map_integers() {
+        val names = Map[String,Int]("first" -> 1, "last" -> 2)
+        val result = JSONSerializer.serialize(names)
+        assertEquals("{\"first\":1,\"last\":2}",result)
     }
    
-
-    /*
-
-     @Test
-     def simpleValueObject_AnyVal() {
-     val result = JSONSerializer.serialize(address);
-     assertEquals("{\"street\":\"Mulholland Drive\",\"city\":\"Los Angeles\",\"state\":\"CA\",\"zip\":\"12345\"}", result)
-
-     }
-
-     @Test
-     def nestedSimpleValueObjects() {
-
-     }
-
-     @Test
-     def nestedComplexObjects() {
     
-     }
 
-     @Test
-     def excludingProperties_annotations() {
+   
 
-     }
-    
-     @Test
-     def excludingProperties_syntax() {
-
-     }*/
+   
 
 }
