@@ -9,8 +9,6 @@ import org.scajorp.dummies._
 
 class JSONSerializerTest {
 
-    val jsonSerializer = new JSONSerializer
-
     var stringDummy: StringDummy = new StringDummy()
     
     var integerDummy: IntegerDummy = new IntegerDummy()
@@ -29,14 +27,14 @@ class JSONSerializerTest {
     def stringObject() {        
         stringDummy.firstName = "John"
         stringDummy.lastName = "Rambo"        
-        val result = jsonSerializer.serialize(stringDummy);
+        val result = JSONSerializer.serialize(stringDummy);
         assertEquals("{\"firstName\":\"John\",\"jsonClass\":\"org.scajorp.dummies.StringDummy\",\"lastName\":\"Rambo\"}", result)
     }
     
     @Test
     def integerObject() {
         integerDummy.age = 21
-        val result = jsonSerializer.serialize(integerDummy);
+        val result = JSONSerializer.serialize(integerDummy);
         assertEquals("{\"age\":21,\"jsonClass\":\"org.scajorp.dummies.IntegerDummy\"}", result)
     }
     
@@ -44,7 +42,7 @@ class JSONSerializerTest {
     def booleanObject() {
         booleanDummy.sad = true
         booleanDummy.happy = false
-        val result = jsonSerializer.serialize(booleanDummy);
+        val result = JSONSerializer.serialize(booleanDummy);
         assertEquals("{\"happy\":false,\"jsonClass\":\"org.scajorp.dummies.BooleanDummy\",\"sad\":true}", result)
     }
     
@@ -54,7 +52,7 @@ class JSONSerializerTest {
         person.firstName = "John"
         person.lastName = "Rambo"
         person.married = true        
-        val result = jsonSerializer.serialize(person);
+        val result = JSONSerializer.serialize(person);
         assertEquals("{\"age\":21,\"firstName\":\"John\",\"jsonClass\":\"org.scajorp.dummies.PersonDummy\",\"lastName\":\"Rambo\",\"married\":true}", result)
     } 
     
@@ -65,7 +63,7 @@ class JSONSerializerTest {
 
      @Test
      def simpleValueObject_AnyVal() {
-     val result = jsonSerializer.serialize(address);
+     val result = JSONSerializer.serialize(address);
      assertEquals("{\"street\":\"Mulholland Drive\",\"city\":\"Los Angeles\",\"state\":\"CA\",\"zip\":\"12345\"}", result)
 
      }
