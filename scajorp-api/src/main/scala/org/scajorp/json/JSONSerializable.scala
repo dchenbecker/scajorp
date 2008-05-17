@@ -9,9 +9,9 @@ trait JSONSerializable {
     
     private val builder = new StringBuilder
  
-    private var opening_literal :String = _  // { or [
+    var opening_literal :String = _  // { or [
     
-    private var closing_literal :String = _ // } or [
+    var closing_literal :String = _ // } or [
     
             
     override def toString() = {  
