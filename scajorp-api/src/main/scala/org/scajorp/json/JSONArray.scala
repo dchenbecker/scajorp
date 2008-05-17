@@ -13,16 +13,6 @@ import scala.collection.jcl.ArrayList
  */
 class JSONArray extends ArrayList[Any] with JSONSerializable{
               
-    val opening_literal = "["
-    val closing_literal = "]"
-                
-    override protected def process() {       
-        this.foreach(value => appendArrayValue(value))                    
-    }
     
-  
-   
-  
-
-
+               
 }

@@ -12,16 +12,4 @@ import scala.collection.jcl.TreeMap
 */
 class JSONObject extends TreeMap[String,Any] with JSONSerializable{
        
-    val opening_literal = "{"
-    val closing_literal = "}"
-     
-    override protected def process() {        
-        for((key,value) <- this) {
-            appendJSONPair(key, value)
-        }   
-    }
-   
-   
-
-
 }

@@ -1,9 +1,9 @@
 package org.scajorp.json 
 
 trait JSONSerializable {
-      
-    val opening_literal: String
-    val closing_literal: String
+ 
+    var opening_literal :String = _
+    var closing_literal :String= _
     
     private val builder = new StringBuilder
     
@@ -20,7 +20,7 @@ trait JSONSerializable {
      * Appends a JSON key-value pair to this trait's StringBuilder
      * followed by a comma.
      */
-    protected def appendJSONPair(key: String, value: Any) {
+    protected def appendObjectPair(key: String, value: Any) {
         appendValue(key);
         appendSeparator()
         appendValue(value)            
@@ -80,16 +80,46 @@ trait JSONSerializable {
     * TODO
     */
     private def serialize():String = {
+        setWrappingLiterals()
         appendOpening()       
         process()
         appendClosing()
         builder.toString()
     }
       
-    /**
-    * TODO
-    */
-    protected def process(): Unit
-
+    private def setWrappingLiterals() {
+        this match {
+            case obj: JSONObject => setObjectLiterals()
+            case array: JSONArray => setArrayLiterals()            
+       }
+    }
+           
+    private def setObjectLiterals(){
+        opening_literal = "{"
+        closing_literal = "}"
+    }
     
+    private def setArrayLiterals(){
+        opening_literal = "["
+        closing_literal = "]"
+    }
+        
+
+    private def process(): Unit = {
+        this match {
+            case obj: JSONObject => processObject(obj)
+            case array: JSONArray => processArray(array)
+            case _ => println("Oops, processing error")
+       }
+    }
+    
+
+    private def processObject(jsonObject: JSONObject) {     
+        jsonObject.foreach(pair => appendObjectPair(pair._1, pair._2))        
+    }
+    
+    private def processArray(jsonArray: JSONArray) {       
+        jsonArray.foreach(value => appendArrayValue(value))                    
+    }
+               
 }
