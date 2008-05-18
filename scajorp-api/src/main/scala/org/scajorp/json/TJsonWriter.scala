@@ -5,7 +5,7 @@ package org.scajorp.json
  * This trait is only supposed to be mixed-in/extended by JSONObject/JSONArray.
  * Can transform both entities to a valid JSON-String.
  */
-trait JSONSerializable {
+trait TJsonWriter {
     
     private val builder = new StringBuilder
  

@@ -11,7 +11,7 @@ import scala.collection.jcl.ArrayList
  * 
  * @author Marco Behler 
  */
-class JSONArray extends ArrayList[Any] with JSONSerializable{
+class JSONArray extends ArrayList[Any] with TJsonWriter{
               
     
                

@@ -10,6 +10,6 @@ import scala.collection.jcl.TreeMap
 * 
 * @author Marco Behler 
 */
-class JSONObject extends TreeMap[String,Any] with JSONSerializable{
+class JSONObject extends TreeMap[String,Any] with TJsonWriter{
        
 }
