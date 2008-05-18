@@ -15,7 +15,7 @@ class JSONSerializerTest {
     
     var booleanDummy = new BooleanDummy()
     
-    var person = new PersonDummy()
+    var person = new PersonDummy()        
     
     val nested = new NestedDummy()
 
@@ -100,14 +100,15 @@ class JSONSerializerTest {
         val result = JSONSerializer.serialize(names)
         assertEquals("[1,2,3]",result)
     }
-    
-    @Test
-    def set_strings() {
-        val names = Set[String]("John", "Dick","Jack")
-        val result = JSONSerializer.serialize(names)
-        assertEquals("[\"John\",\"Dick\",\"Jack\"]",result)
-    }
-    
+
+    // TODO
+//    @Test
+//    def set_strings() {
+//        val names = Set[String]("John", "Dick","Jack")
+//        val result = JSONSerializer.serialize(names)
+//        assertEquals("[\"John\",\"Dick\",\"Jack\"]",result)
+//    }
+//    
     @Test
     def map_strings() {
         val names = Map[String,String]("first" -> "Rambo", "last" -> "Wayne")
@@ -123,9 +124,54 @@ class JSONSerializerTest {
     }
    
     
-
-   
-
+    /* ---- Nested tests ----- */
+    @Test
+    def nested_maps() {
+        val john = Map[String,String] ("name" -> "John")
+        val eliott = Map[String,Any] ("name" -> "Eliott", "husband" -> john)
+        val result = JSONSerializer.serialize(eliott)
+        assertEquals("{\"husband\":{\"name\":\"John\"},\"name\":\"Eliott\"}",result)
+    }
+    
+    @Test
+    def nested_lists() {
+        val list1 = List[String]("John", "Eliott")
+        val list2 = List[Any]("friends", list1)        
+        val result = JSONSerializer.serialize(list2)
+        assertEquals("[\"friends\",[\"John\",\"Eliott\"]]",result)
+    }
+    
+    @Test
+    def nested_arrays() {
+        val array1 = Array[String]("John", "Eliott")
+        val array2 = Array[AnyRef]("friends", array1)        
+        val result = JSONSerializer.serialize(array2)
+        assertEquals("[\"friends\",[\"John\",\"Eliott\"]]",result)
+    }
+    
+    @Test
+    def nested_mixed_obj_first() {
+        val friends = List[String]("Turk", "Cox")
+        val john = Map[String,Any] ("name" -> "John", "friends" -> friends)
+        val result = JSONSerializer.serialize(john)
+        assertEquals("{\"friends\":[\"Turk\",\"Cox\"],\"name\":\"John\"}",result)
+    }
+    
+    @Test
+    def nested_mixed_lists_first() {
+      val john = Map[String,Any] ("name" -> "John")
+      val friends = List[Any]("Turk", john)
+      val result = JSONSerializer.serialize(friends)
+      assertEquals("[\"Turk\",{\"name\":\"John\"}]",result)
+    }
+    
+    @Test
+    def list_with_pojo() {        
+        val friends = List[Any](nested)
+        val result = JSONSerializer.serialize(friends)
+        assertEquals("[{\"age\":21,\"jsonClass\":\"org.scajorp.dummies.NestedDummy\",\"name\":\"John\",\"person\":{\"age\":null,\"firstName\":null,\"jsonClass\":\"org.scajorp.dummies.PersonDummy\",\"lastName\":null,\"married\":false}}]",result)
+    }
+  
    
 
 }

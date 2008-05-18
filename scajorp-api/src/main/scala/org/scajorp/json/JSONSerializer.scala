@@ -17,90 +17,78 @@ import org.scajorp.json._
  * @author Derek Chen-Becker
  */
 object JSONSerializer {
+    
+    val class_literal = "jsonClass"
     /**
      * Creates a serialized representation of the given object.
      */
     def serialize(obj :AnyRef):String = {
         val jsonObj = obj match {
-            case (collection: Collection[_]) => processCollection(collection)
-            case _ => createJSONObject(obj, None)
+            case (map: Map[String,Any]) => serializeMap(map)
+            case (seq: Seq[_]) => serializeSequence(seq)            
+            case _ => serializePOSO(obj, None)
         }        
         jsonObj.toString()            
     }
-    
-
-    private def processCollection(collection: Collection[_]) ={
-        val json = collection match {
-            case (map: Map[String,Any]) => convertMap(map)
-            case _ => createJSONArray(collection, None)
-        }
-        json
+      
+    private def serializePOSO(obj: AnyRef, requestedFields : Option[Set[String]]): JSONObject= {                        
+        val map = getFieldMap(obj)      
+        return serializeMap(map)                
     }
-
-
-    
-    /**
-     * Creates a serialized representation of the given object, but only for
-     * the fields in the requestedFields set. This method exists so that you 
-     * can effectively hide internal fields if needed.
-     */
-    def serialize(obj : AnyRef, requestedFields : Set[String]) : String = {
-        val jsonObj = createJSONObject(obj, Some(requestedFields))
-        jsonObj.toString()
+      
+    private def serializeMap(map: Map[String,Any]):JSONObject = {
+        val jsonObj = new JSONObject
+        map.foreach( (pair) => valueMatch(pair._1, pair._2, jsonObj))        
+        return jsonObj
     }
     
-  
-    
-    private def addField(field: Field, obj: AnyRef, jsonObj: JSONObject) = {
-         
-        field.setAccessible(true)            
-        val name = field.getName()
-        val value = field.get(obj)            
-        value match {
-            case (s:String) => jsonObj+= (name -> value)
-            case (i:Integer) => jsonObj+= (name -> value)
-            case (l:java.lang.Long) => jsonObj+= (name -> value)
-            case (f:java.lang.Float) => jsonObj+= (name -> value)
-            case (s:java.lang.Short) => jsonObj+= (name -> value)
-            case (b:java.lang.Byte) => jsonObj+= (name -> value)
-            case (b:java.lang.Boolean) => jsonObj+= (name -> value)                                    
-            case null => jsonObj+= (name -> value)                   
-            case obj: AnyRef => jsonObj+= (name -> createJSONObject(obj, None))
-        }
-    }
-
-    private def createJSONObject(obj: AnyRef, requestedFields : Option[Set[String]]): JSONObject= {        
-        val jsonObj = new JSONObject                
-        jsonObj += ("jsonClass" -> obj.getClass().getName())
-
-        val fields = getFields(obj, requestedFields)
-     
-        fields.foreach(field => addField(field,obj, jsonObj))
-        jsonObj
+    private def getFieldMap(poso: AnyRef): Map[String,Any] =  {
+        var fields = poso.getClass.getDeclaredFields()        
+        val map = scala.collection.mutable.Map.empty[String,Any]
+        
+        map += (class_literal -> poso.getClass().getName())  
+        for (field <- fields) {
+            field.setAccessible(true)
+            map += field.getName() -> field.get(poso)
+        }                          
+        map
     }
     
-    private def createJSONArray(collection: Collection[_], requestedFields : Option[Set[String]]): JSONArray = {        
+    def serializeSequence(seq: Seq[Any]): JSONArray = {
         val jsonArray = new JSONArray                
-        collection.foreach(field => jsonArray += field)       
+        for (value <-seq) {
+            value match {
+                case (s:String) => jsonArray+= value
+                case (i:Integer) => jsonArray+= value
+                case (l:java.lang.Long) => jsonArray+= value
+                case (f:java.lang.Float) => jsonArray+= value
+                case (s:java.lang.Short) => jsonArray+= value
+                case (b:java.lang.Byte) => jsonArray+= value
+                case (b:java.lang.Boolean) => jsonArray+= value                                    
+                case null => jsonArray+= value                   
+                case seq: Seq[Any] => jsonArray += serializeSequence(seq)                
+                case map: Map[String,Any] => jsonArray += serializeMap(map)                    
+                case obj: AnyRef => jsonArray+= serializePOSO(obj, None)
+            } 
+        }     
         jsonArray
     }
-    
-    
-    private def convertMap(map: Map[String,Any]): JSONObject = {
-        val jsonObject = new JSONObject
-        for ((key, value) <- map) {
-            jsonObject += (key -> value)
-        }
-        return jsonObject
-    }
-        
+         
+    def valueMatch(name: String, value: Any, jsonObj: JSONObject):Unit = {
+        value match {
+                case (s:String) => jsonObj+= (name -> value)
+                case (i:Integer) => jsonObj+= (name -> value)
+                case (l:java.lang.Long) => jsonObj+= (name -> value)
+                case (f:java.lang.Float) => jsonObj+= (name -> value)
+                case (s:java.lang.Short) => jsonObj+= (name -> value)
+                case (b:java.lang.Byte) => jsonObj+= (name -> value)
+                case (b:java.lang.Boolean) => jsonObj+= (name -> value)                                    
+                case null => jsonObj+= (name -> value)                   
+                case seq: Seq[Any] => jsonObj += name -> serializeSequence(seq)                
+                case map: Map[String,Any] => jsonObj +=  name -> serializeMap(map)                    
+                case obj: AnyRef => jsonObj+= (name -> serializePOSO(obj, None))
+            }
+    } 
 
-    private def getFields(obj: AnyRef, requestedFields : Option[Set[String]]) =  {
-        // Either fetch all fields or only those requested
-        val fields = requestedFields match {
-            case Some(names) => obj.getClass.getDeclaredFields().filter({field => names.contains(field.getName)})
-            case None => obj.getClass.getDeclaredFields
-        }
-        fields
-    }
+      
 }
