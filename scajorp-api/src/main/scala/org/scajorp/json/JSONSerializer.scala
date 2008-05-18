@@ -38,55 +38,42 @@ object JSONSerializer {
       
     private def serializeMap(map: Map[String,Any]):JSONObject = {
         val jsonObj = new JSONObject
-        map.foreach( (pair) => valueMatch(pair._1, pair._2, jsonObj))        
+        map.foreach( pair => jsonObj += (pair._1 -> serializeValue(pair._2)))        
         return jsonObj
+    }
+   
+    private def serializeSequence(seq: Seq[Any]): JSONArray = {
+        val jsonArray = new JSONArray
+        seq.foreach( field => jsonArray += serializeValue(field))
+        return jsonArray
     }
     
     private def getFieldMap(poso: AnyRef): Map[String,Any] =  {
         var fields = poso.getClass.getDeclaredFields()        
-        val map = scala.collection.mutable.Map.empty[String,Any]
+        val fieldMap = scala.collection.mutable.Map.empty[String,Any]
         
-        map += (class_literal -> poso.getClass().getName())  
+        fieldMap += (class_literal -> poso.getClass().getName())  
         for (field <- fields) {
             field.setAccessible(true)
-            map += field.getName() -> field.get(poso)
+            fieldMap += field.getName() -> field.get(poso)
         }                          
-        map
+        fieldMap
     }
     
-    def serializeSequence(seq: Seq[Any]): JSONArray = {
-        val jsonArray = new JSONArray                
-        for (value <-seq) {
-            value match {
-                case (s:String) => jsonArray+= value
-                case (i:Integer) => jsonArray+= value
-                case (l:java.lang.Long) => jsonArray+= value
-                case (f:java.lang.Float) => jsonArray+= value
-                case (s:java.lang.Short) => jsonArray+= value
-                case (b:java.lang.Byte) => jsonArray+= value
-                case (b:java.lang.Boolean) => jsonArray+= value                                    
-                case null => jsonArray+= value                   
-                case seq: Seq[Any] => jsonArray += serializeSequence(seq)                
-                case map: Map[String,Any] => jsonArray += serializeMap(map)                    
-                case obj: AnyRef => jsonArray+= serializePOSO(obj, None)
-            } 
-        }     
-        jsonArray
-    }
-         
-    def valueMatch(name: String, value: Any, jsonObj: JSONObject):Unit = {
+    
+    def serializeValue(value: Any):Any = {
         value match {
-                case (s:String) => jsonObj+= (name -> value)
-                case (i:Integer) => jsonObj+= (name -> value)
-                case (l:java.lang.Long) => jsonObj+= (name -> value)
-                case (f:java.lang.Float) => jsonObj+= (name -> value)
-                case (s:java.lang.Short) => jsonObj+= (name -> value)
-                case (b:java.lang.Byte) => jsonObj+= (name -> value)
-                case (b:java.lang.Boolean) => jsonObj+= (name -> value)                                    
-                case null => jsonObj+= (name -> value)                   
-                case seq: Seq[Any] => jsonObj += name -> serializeSequence(seq)                
-                case map: Map[String,Any] => jsonObj +=  name -> serializeMap(map)                    
-                case obj: AnyRef => jsonObj+= (name -> serializePOSO(obj, None))
+                case (s:String) => value
+                case (i:Integer) => value
+                case (l:java.lang.Long) => value
+                case (f:java.lang.Float) => value
+                case (s:java.lang.Short) => value
+                case (b:java.lang.Byte) => value
+                case (b:java.lang.Boolean) => value
+                case null => value                   
+                case seq: Seq[Any] => serializeSequence(seq)                
+                case map: Map[String,Any] => serializeMap(map)                    
+                case obj: AnyRef => serializePOSO(obj, None)
             }
     } 
 

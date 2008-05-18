@@ -12,7 +12,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 
 
-class JSONSerializableTest {
+class TJSONWriterTest {
     
     var jsonObject : JSONObject = _
   
