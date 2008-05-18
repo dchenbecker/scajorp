@@ -47,6 +47,13 @@ class JSONSerializableTest {
         val result = jsonObject.toString()
         assertEquals("{\"kids\":1}", result)
     }
+    
+    @Test
+    def nul() {      
+        jsonObject += "kids" -> null
+        val result = jsonObject.toString()
+        assertEquals("{\"kids\":null}", result)
+    }
   
     @Test
     def fraction_float() {      
