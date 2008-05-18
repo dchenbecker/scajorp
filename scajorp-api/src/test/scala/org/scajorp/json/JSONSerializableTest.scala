@@ -71,5 +71,25 @@ class JSONSerializableTest {
         val result = jsonArray.toString()
         assertEquals("[\"Dr. Cox\",true,1,1.23,1.23]", result)
     }
+    
 
+    @Test
+    def nested_object() {
+        jsonObject += "kids" -> 5    
+        val nestedObject = new JSONObject()
+        nestedObject += "count" -> 5
+        jsonObject += "grandkids" -> nestedObject
+        val result = jsonObject.toString
+        assertEquals("{\"grandkids\":{\"count\":5},\"kids\":5}", result)
+    }
+    
+    @Test
+    def nested_array() {
+        jsonArray.addAll(List[String]("Barbara", "Fred"))
+        val nestedArray = new JSONArray
+        nestedArray.addAll(List[String]("Tom","Jones"))
+        jsonArray += nestedArray
+        val result = jsonArray.toString
+        assertEquals("[\"Barbara\",\"Fred\",[\"Tom\",\"Jones\"]]", result)
+    }
 }
