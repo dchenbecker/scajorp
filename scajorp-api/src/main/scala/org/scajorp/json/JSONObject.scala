@@ -1,15 +1,15 @@
 package org.scajorp.json
+
 import scala.collection.jcl.TreeMap
 
 /**
-* Scala representation of a JSONObject. JSONObject is simply a HashMap
-* that knows how to turn itself into a JSON String via the capabilities
-* offered by trait JSONSerializable. Simply call toString() and the object
-* will be converted to a proper JSON String. 
-* Is not yet secured against circular dependencies.
-* 
-* @author Marco Behler 
-*/
-class JSONObject extends TreeMap[String,Any] with TJsonWriter{
-       
-}
+ * A JSON object can simply be represented as a Map.
+ * This class is a TreeMap which's toString() method will turn it
+ * into a valid JSON string. It does so by delegating all responsibility
+ * to trait TJSONWriter. 
+ *  
+ * @author Marco Behler 
+ * @see TJSONWriter
+ */
+
+class JSONObject extends TreeMap[String,Any] with TJSONWriter

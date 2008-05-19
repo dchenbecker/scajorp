@@ -1,11 +1,16 @@
 package org.scajorp.json 
 
-
 /**
- * This trait is only supposed to be mixed-in/extended by JSONObject/JSONArray.
- * Can transform both entities to a valid JSON-String.
+ * ATTENTION: This trait is only supposed to be mixed-in/extended by JSONObject/JSONArray.
+ * Its sole purpose is to turn either into a valid JSON string by overriding
+ * their toString() method. TJSONWriter does not know how to process anything
+ * but JSONObjects/JSONArrays and AnyVals. Another class (JSONSerializer) is 
+ * therefore needed to create proper JSONObjects and JSONArrays.
+ * 
+ * @author Marco Behler 
+ * @see JSONSerializer
  */
-trait TJsonWriter {
+trait TJSONWriter {
     
     private val builder = new StringBuilder
  
