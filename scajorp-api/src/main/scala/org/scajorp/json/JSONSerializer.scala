@@ -28,6 +28,7 @@ object JSONSerializer {
     def serialize(obj :AnyRef):String = {
         val jsonObj = obj match {
             case (map: Map[String,Any]) => createJSONObject(map)
+            case (set: Set[Any]) => createJSONArray(set)
             case (seq: Seq[_]) => createJSONArray(seq)            
             case _ => createJSONObject(obj, None)
         }        
@@ -63,6 +64,17 @@ object JSONSerializer {
     private def createJSONArray(seq: Seq[Any]): JSONArray = {
         val result = new JSONArray
         seq.foreach( field => result += jsonValue(field))
+        return result
+    }
+    
+    /**
+    * Create a JSONArray from a Set.
+    *
+    * @return the JSONArray
+    */
+    private def createJSONArray(set: Set[Any]): JSONArray = {
+        val result = new JSONArray
+        set.foreach( field => result += jsonValue(field))
         return result
     }
     
@@ -105,6 +117,7 @@ object JSONSerializer {
                 case (b:java.lang.Boolean) => value
                 case null => value                   
                 case seq: Seq[Any] => createJSONArray(seq)                
+                case set: Set[Any] => createJSONArray(set)
                 case map: Map[String,Any] => createJSONObject(map)                    
                 case obj: AnyRef => createJSONObject(obj, None)
             }
