@@ -9,7 +9,9 @@ import org.scajorp.dummies._
 
 class JSONSerializerTest {
     
-    var rambo = new JohnRambo()
+    val rambo = new JohnRambo()
+    
+    val drCox = new DrCox()
        
     /* ----- (P)lain (O)ld (S)cala (O)bject tests ----- */
         
@@ -18,6 +20,12 @@ class JSONSerializerTest {
         val result = JSONSerializer.serialize(rambo);
         assertEquals("{\"age\":66,\"job\":\"warrior\",\"jsonClass\":\"org.scajorp.dummies.JohnRambo\",\"married\":false}", result)
     } 
+    
+    @Test
+    def poso_complex() {
+        val result = JSONSerializer.serialize(drCox);
+        assertEquals("{\"alphaMale\":true,\"girlfriends\":[{\"jsonClass\":\"org.scajorp.dummies.Friend\",\"name\":\"Carla\"},{\"jsonClass\":\"org.scajorp.dummies.Friend\",\"name\":\"JD\"},{\"jsonClass\":\"org.scajorp.dummies.Friend\",\"name\":\"Janitor\"}],\"jsonClass\":\"org.scajorp.dummies.DrCox\"}", result);
+    }
     
     
     /* ----- Collection tests ----- */
