@@ -37,7 +37,7 @@ trait TJSONWriter {
         this match {
             case obj: JSONObject => processObject(obj)
             case array: JSONArray => processArray(array)
-            case _ => println(">>> ERR: This isn't a JSONObject or JSONArray. Cannot process body.")
+            case _ => error(">>> ERR: This isn't a JSONObject or JSONArray. Cannot process body <<<.")
         }
     }
     
@@ -100,7 +100,7 @@ trait TJSONWriter {
         this match {
             case obj: JSONObject => setObjectLiterals()
             case array: JSONArray => setArrayLiterals()   
-            case _ => println(">>> ERR: This isn't a JSONObject or JSONArray. Cannot determine literals.")                
+            case _ => error(">>> ERR: This isn't a JSONObject or JSONArray. Cannot determine literals. <<<")                
         }
     }
            

@@ -4,7 +4,7 @@ import java.lang.reflect.Method
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import scala.collection.Map
-import scala.collection.mutable.{HashSet,Set}
+import scala.collection.mutable.{HashSet, Set}
 import scala.StringBuilder
 
 
@@ -21,6 +21,7 @@ class CircularReferenceException(message : String) extends Exception(message)
  */
 object JSONSerializer {
     
+    
     val class_literal = "jsonClass"
     
     /**
@@ -29,105 +30,80 @@ object JSONSerializer {
      * @return the JSON string
      */
     def serialize(obj :AnyRef) : String = serializeInternal(obj, None, None)
-
-    def serializeOnly(obj : AnyRef, wanted : Set[String]) : String = serializeInternal(obj, Some(wanted), None)
-
-    def serializeExcept(obj : AnyRef, unwanted : Set[String]) : String = serializeInternal(obj, None, Some(unwanted))
-
-    private def serializeInternal(obj : AnyRef, wanted : Option[Set[String]], unwanted : Option[Set[String]]) : String = {
-      val seen = new HashSet[AnyRef]()
-
-      val jsonObj = obj match {
-        case (map: Map[String,Any]) => createJSONObject(map, wanted, unwanted, seen)
-        case (set: Set[Any]) => createJSONArray(set, seen)
-        case (seq: Seq[_]) => createJSONArray(seq, seen)
-        case _ => createJSONObject(obj, wanted, unwanted, seen)
-      }        
-      jsonObj.toString()            
-    }
-
+    
     /**
-    * Create a JSONObject from a Map.
     *
-    * @return the JSONObject
-    */
-    private def createJSONObject(map: Map[String,Any],wantedFields : Option[Set[String]], unwantedFields : Option[Set[String]], seen : Set[AnyRef]):JSONObject = {
-        val filteredMap = (wantedFields,unwantedFields) match {
-	  case (None, None) => map
-	  case (Some(wanted), _) => map.filter({case (field,value) => wanted.contains(field)})
-	  case (None, Some(unwanted)) => map.filter({case (field,value) => ! unwanted.contains(field)})
-	}
-
-      buildJSONObjectFromIterable(filteredMap, seen)
-    }
-
-    /**
-    * Create a JSONObject from any (P)lain (O)ld (S)cala (O)bject.
+    * Turns the given object into a JSON string, serializing however
+    * only the values specified as includes.
     *
-    * @return the JSONObject
+    * @return the JSON string
     */
-    private def createJSONObject(poso: AnyRef, wantedFields : Option[Set[String]], unwantedFields : Option[Set[String]], seen : Set[AnyRef]): JSONObject= {
-        buildJSONObjectFromIterable(getFieldsMap(poso, wantedFields, unwantedFields), seen)
-    }
+    def serializeOnly(obj : AnyRef, includes : Set[String]) : String = serializeInternal(obj, Some(includes), None)
+    
 
     /**
-    * Fed with any (P)lain (O)ld (S)cala (O)bject will return a Map
-    * with the poso's field names mapped to the field's value.
-    * e.g.: Map("name" -> "Dr. Cox"). wantedFields and unwantedFields are mutually exclusive; wantedFields 
-    * always takes priority and will, in effect, override any supplied unwantedFields Set.
     *
-    * @param wantedFields Optional set to request that only certain fields be serialized
-    * @param unwantedFields Optional set to request that certain fields be excluded from serialization
-    * 
-    * @return the Map(fieldName -> fieldValue)
+    * Turns the given object into a JSON string, serializing the object without
+    * all fields specified as excludes.
+    *
+    * @return the JSON string
     */
-    private def getFieldsMap(poso: AnyRef, wantedFields : Option[Set[String]], unwantedFields : Option[Set[String]]): Map[String,Any] = {
-      var fields = (wantedFields,unwantedFields, poso.getClass.getDeclaredFields()) match {
-	case (None, None, decFields) => decFields
-	case (Some(wanted), _, decFields) => decFields.filter(field => wanted.contains(field.getName()))
-	case (None, Some(unwanted), decFields) => decFields.filter(field => ! unwanted.contains(field.getName()))
-      }
-      
-      val fieldMap = scala.collection.mutable.Map.empty[String,Any]
-        
-      fieldMap += (class_literal -> poso.getClass().getName())  
-      for (field <- fields) {
-        field.setAccessible(true)
-        fieldMap += field.getName() -> field.get(poso)
-      }                          
-      fieldMap
-    }
-      
-  private def buildJSONObjectFromIterable(map : Iterable[(String,Any)], seen : Set[AnyRef]) : JSONObject = {
-        val result = new JSONObject
-        map.foreach({case (key,value) => result += (key -> jsonValue(value, seen))})
-        return result
-  }
-  
-    // TODO: Can the two createJSONArray methods be combined using Iterable?
-
+    def serializeExcept(obj : AnyRef, excludes : Set[String]) : String = serializeInternal(obj, None, Some(excludes))
+    
     /**
-     * Create a JSONArray from a Sequence (Lists, Arrays etc.).
-     *
-     * @return the JSONArray
-     */
-    private def createJSONArray(seq: Seq[Any], seen : Set[AnyRef]): JSONArray = {
-        val result = new JSONArray
-        seq.foreach(field => result += jsonValue(field, seen))
-        return result
+    * Does the heavy lifting. Creates a JSONArray (from a collection) or a JSONObject
+    * (from a poso) and simply invokes its toString() method.    
+    *    
+    * @return the JSON string
+    */
+    private def serializeInternal(obj : AnyRef, includes : Option[Set[String]], excludes : Option[Set[String]]) : String = {
+        val seen = new HashSet[Any]()
+        val jsonEntity = obj match {            
+            case collection: Collection[_] => processCollection(collection, seen)            
+            case _ => processPOSO(obj, includes, excludes, seen)
+        }        
+        jsonEntity.toString()            
     }
     
     /**
-     * Create a JSONArray from a Set.
+     * Create a JSONObject from any (P)lain (O)ld (S)cala (O)bject. Will turn
+     * the pojo into a Map(fieldName -> fieldValue) and delegate responsibilty
+     * to processCollection().
      *
-     * @return the JSONArray
-     */
-    private def createJSONArray(set: Set[Any], seen : Set[AnyRef]): JSONArray = {
-        val result = new JSONArray
-        set.foreach(field => result += jsonValue(field,seen))
+     * @return the JSONObject
+     */  
+    private def processPOSO(poso: AnyRef,  includes : Option[Set[String]], excludes : Option[Set[String]], seen: Set[Any]): TJSONWriter = {        
+        seen += poso
+        val fieldMap = getFieldsMap(poso, includes, excludes)
+        return processCollection(fieldMap, seen)
+    }
+
+  
+    private def processCollection(collection: Collection[Any], seen : Set[Any]): TJSONWriter = {
+        seen += collection    // TODO redundant when pojo, harmful?    
+        val result =  collection match {
+            case map : Map[String,Any] => createJSONObject(map, seen)
+            case set : scala.collection.Set[Any] => createJSONArray(set, seen)
+            case sequence : Seq[Any] => createJSONArray(sequence, seen)
+            case _ => error("Not a collection[=" + collection +"]")
+        }
         return result
     }
-        
+    
+    private def createJSONObject(map: Map[String,Any], seen : Set[Any]): JSONObject = {
+        val result = new JSONObject()
+        map.foreach((pair) => if (!seen.contains(pair._2)) result += (pair._1 -> jsonValue(pair._2, seen)))
+        return result
+    }
+                
+    private def createJSONArray(col: Collection[Any], seen : Set[Any]): JSONArray = {
+        val result = new JSONArray()
+        col.foreach(value => if (!seen.contains(value)) result+= jsonValue(value, seen))
+        return result
+    }
+
+  
+                 
     /**
      * This method will return the JSON value of Any. All AnyVals will remain
      * unchanged, whereas all Sequences will be converted to JSONArrays and all
@@ -136,26 +112,50 @@ object JSONSerializer {
      *
      * @return the json value (value, JSONObject or JSONArray)
      */
-    def jsonValue(value: Any, seen : Set[AnyRef]) = {
-      if (value.isInstanceOf[AnyRef]) {
-	if (seen.contains(value.asInstanceOf[AnyRef])) {
-	  throw new CircularReferenceException(value.toString + " is a circular reference")
-	}
-	seen += value.asInstanceOf[AnyRef]
-      }
+    def jsonValue(value: Any, seen : Set[Any]) = {
+        value match {
+            case (s:String) => value
+            case (i:Integer) => value
+            case (l:java.lang.Long) => value
+            case (f:java.lang.Float) => value
+            case (s:java.lang.Short) => value
+            case (b:java.lang.Byte) => value
+            case (b:java.lang.Boolean) => value
+            case null => value                   
+            case collection: Collection[Any] => processCollection(collection, seen)    
+            case poso: AnyRef => processPOSO(poso, None, None, seen)
+        }
+    }
+    
 
-      value match {
-        case (s:String) => value
-        case (i:Integer) => value
-        case (l:java.lang.Long) => value
-        case (f:java.lang.Float) => value
-        case (s:java.lang.Short) => value
-          case (b:java.lang.Byte) => value
-        case (b:java.lang.Boolean) => value
-        case null => value                   
-        case seq: Seq[Any] => createJSONArray(seq, seen)
-        case set: Set[Any] => createJSONArray(set, seen)
-        case a: AnyRef => createJSONObject(a, None, None, seen)
-      }
+    
+    /**
+     * Fed with any (P)lain (O)ld (S)cala (O)bject will return a Map
+     * with the poso's field names mapped to the field's value.
+     * e.g.: Map("name" -> "Dr. Cox"). include and exclude are mutually exclusive; include 
+     * always takes priority and will, in effect, override any supplied exclude Set.
+     *
+     * @param includes Optional set to request that only certain fields be serialized
+     * @param excludes Optional set to request that certain fields be excluded from serialization
+     * 
+     * @return the Map(fieldName -> fieldValue)
+     */
+    private def getFieldsMap(poso: AnyRef, includes : Option[Set[String]], excludes : Option[Set[String]]): Map[String,Any] = {
+        val fields =
+        (poso.getClass.getDeclaredFields(), includes, excludes) match {
+            case (fields, None, None) => fields
+            case (fields, Some(includes), _ ) => fields.filter(field => includes.contains(field.getName()))
+            case (fields, None, Some(excludes)) => fields.filter(field => ! excludes.contains(field.getName()))
+        }
+      
+        val fieldMap = scala.collection.mutable.Map.empty[String,Any]
+        
+        fieldMap += (class_literal -> poso.getClass().getName())  
+      
+        for (field <- fields) {
+            field.setAccessible(true)
+            fieldMap += field.getName() -> field.get(poso)
+        }                          
+        fieldMap
     }
 }
