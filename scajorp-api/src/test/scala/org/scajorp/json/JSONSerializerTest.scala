@@ -6,12 +6,16 @@ import org.junit.Before
 import org.junit.After
 import org.junit.Assert._
 import org.scajorp.dummies._
+import org.scajorp.dummies.circular._
 
 class JSONSerializerTest {
     
     val rambo = new JohnRambo()
     
     val drCox = new DrCox()
+    
+   // val teacher = new Teacher("Jack", new Principal("God"))
+    val principal = new Principal("God")
        
     /* ----- (P)lain (O)ld (S)cala (O)bject tests ----- */
         
@@ -27,6 +31,17 @@ class JSONSerializerTest {
         assertEquals("{\"alphaMale\":true,\"girlfriends\":[{\"jsonClass\":\"org.scajorp.dummies.Friend\",\"name\":\"Carla\"},{\"jsonClass\":\"org.scajorp.dummies.Friend\",\"name\":\"JD\"},{\"jsonClass\":\"org.scajorp.dummies.Friend\",\"name\":\"Janitor\"}],\"jsonClass\":\"org.scajorp.dummies.DrCox\"}", result);
     }
     
+    @Test
+    def poso_circular() {
+        val result = JSONSerializer.serialize(principal)
+        println ("---- result" + result)
+        assertEquals("{\"jsonClass\":\"org.scajorp.dummies.circular.Principal\",\"name\":\"God\"," +
+                     "\"underlings\":[" +
+                           "{\"jsonClass\":\"org.scajorp.dummies.circular.Teacher\",\"name\":\"Jack\",\"student\":{\"jsonClass\":\"org.scajorp.dummies.circular.Student\",\"name\":\"Jack Bauer\"}}," +
+                           "{\"jsonClass\":\"org.scajorp.dummies.circular.Teacher\",\"name\":\"John\",\"student\":{\"jsonClass\":\"org.scajorp.dummies.circular.Student\",\"name\":\"Jack Bauer\"}}" +
+                           "]}", result)
+    }
+
     
     /* ----- Collection tests ----- */
     
