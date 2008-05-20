@@ -4,10 +4,13 @@ import java.lang.reflect.Method
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import scala.collection.Map
+import scala.collection.mutable.{HashSet,Set}
 import scala.StringBuilder
 
 
 import org.scajorp.json._
+
+class CircularReferenceException(message : String) extends Exception(message)
 
 /**
  * Utility object to handle the serialization of objects into their JSON
@@ -32,68 +35,40 @@ object JSONSerializer {
     def serializeExcept(obj : AnyRef, unwanted : Set[String]) : String = serializeInternal(obj, None, Some(unwanted))
 
     private def serializeInternal(obj : AnyRef, wanted : Option[Set[String]], unwanted : Option[Set[String]]) : String = {
+      val seen = new HashSet[AnyRef]()
+
       val jsonObj = obj match {
-        case (map: Map[String,Any]) => createJSONObject(map, wanted, unwanted)
-        case (set: Set[Any]) => createJSONArray(set)
-        case (seq: Seq[_]) => createJSONArray(seq)            
-        case _ => createJSONObject(obj, wanted, unwanted)
+        case (map: Map[String,Any]) => createJSONObject(map, wanted, unwanted, seen)
+        case (set: Set[Any]) => createJSONArray(set, seen)
+        case (seq: Seq[_]) => createJSONArray(seq, seen)
+        case _ => createJSONObject(obj, wanted, unwanted, seen)
       }        
       jsonObj.toString()            
     }
 
+    /**
+    * Create a JSONObject from a Map.
+    *
+    * @return the JSONObject
+    */
+    private def createJSONObject(map: Map[String,Any],wantedFields : Option[Set[String]], unwantedFields : Option[Set[String]], seen : Set[AnyRef]):JSONObject = {
+        val filteredMap = (wantedFields,unwantedFields) match {
+	  case (None, None) => map
+	  case (Some(wanted), _) => map.filter({case (field,value) => wanted.contains(field)})
+	  case (None, Some(unwanted)) => map.filter({case (field,value) => ! unwanted.contains(field)})
+	}
+
+      buildJSONObjectFromIterable(filteredMap, seen)
+    }
 
     /**
     * Create a JSONObject from any (P)lain (O)ld (S)cala (O)bject.
     *
     * @return the JSONObject
     */
-    private def createJSONObject(poso: AnyRef, wantedFields : Option[Set[String]], unwantedFields : Option[Set[String]]): JSONObject= {
-        val map = getFieldsMap(poso, wantedFields, unwantedFields)
-        return createJSONObject(map)                
+    private def createJSONObject(poso: AnyRef, wantedFields : Option[Set[String]], unwantedFields : Option[Set[String]], seen : Set[AnyRef]): JSONObject= {
+        buildJSONObjectFromIterable(getFieldsMap(poso, wantedFields, unwantedFields), seen)
     }
-      
-    /**
-    * Create a JSONObject from a Map.
-    *
-    * @return the JSONObject
-    */
-    private def createJSONObject(map: Map[String,Any],wantedFields : Option[Set[String]], unwantedFields : Option[Set[String]]):JSONObject = {
-        val filteredMap = (wantedFields,unwantedFields) match {
-	  case (None, None) => map
-	  case (Some(wanted), _) => map.filter(field => wanted.contains(field.getName()))
-	  case (None, Some(unwanted)) => map.filter(field => ! unwanted.contains(field.getName()))
-	}
-
-        val result = new JSONObject
-        filteredMap.foreach( pair => result += (pair._1 -> jsonValue(pair._2)))        
-        return result
-    }
-  
-   
-    /**
-     * Create a JSONArray from a Sequence (Lists, Arrays etc.).
-     *
-     * @return the JSONArray
-     */
-    private def createJSONArray(seq: Seq[Any]): JSONArray = {
-        parents += seq
-        val result = new JSONArray
-        seq.foreach( field => addArrayValue(field, result))
-        return result
-    }
-    
-    /**
-     * Create a JSONArray from a Set.
-     *
-     * @return the JSONArray
-     */
-    private def createJSONArray(set: Set[Any]): JSONArray = {
-        parents += set
-        val result = new JSONArray
-        set.foreach( field => addArrayValue(field, result))
-        return result
-    }
-    
 
     /**
     * Fed with any (P)lain (O)ld (S)cala (O)bject will return a Map
@@ -122,7 +97,37 @@ object JSONSerializer {
       }                          
       fieldMap
     }
+      
+  private def buildJSONObjectFromIterable(map : Iterable[(String,Any)], seen : Set[AnyRef]) : JSONObject = {
+        val result = new JSONObject
+        map.foreach({case (key,value) => result += (key -> jsonValue(value, seen))})
+        return result
+  }
+  
+    // TODO: Can the two createJSONArray methods be combined using Iterable?
+
+    /**
+     * Create a JSONArray from a Sequence (Lists, Arrays etc.).
+     *
+     * @return the JSONArray
+     */
+    private def createJSONArray(seq: Seq[Any], seen : Set[AnyRef]): JSONArray = {
+        val result = new JSONArray
+        seq.foreach(field => result += jsonValue(field, seen))
+        return result
+    }
     
+    /**
+     * Create a JSONArray from a Set.
+     *
+     * @return the JSONArray
+     */
+    private def createJSONArray(set: Set[Any], seen : Set[AnyRef]): JSONArray = {
+        val result = new JSONArray
+        set.foreach(field => result += jsonValue(field,seen))
+        return result
+    }
+        
     /**
      * This method will return the JSON value of Any. All AnyVals will remain
      * unchanged, whereas all Sequences will be converted to JSONArrays and all
@@ -131,37 +136,26 @@ object JSONSerializer {
      *
      * @return the json value (value, JSONObject or JSONArray)
      */
-    def jsonValue(value: Any):Any = {
-        value match {
-            case (s:String) => value
-            case (i:Integer) => value
-            case (l:java.lang.Long) => value
-            case (f:java.lang.Float) => value
-            case (s:java.lang.Short) => value
-            case (b:java.lang.Byte) => value
-            case (b:java.lang.Boolean) => value
-            case null => value                   
-            case seq: Seq[Any] => createJSONArray(seq)                
-            case set: Set[Any] => createJSONArray(set)
-            case a: AnyRef => createJSONObject(a, None)                                
-        }
-    } 
-    
+    def jsonValue(value: Any, seen : Set[AnyRef]) = {
+      if (value.isInstanceOf[AnyRef]) {
+	if (seen.contains(value.asInstanceOf[AnyRef])) {
+	  throw new CircularReferenceException(value.toString + " is a circular reference")
+	}
+	seen += value.asInstanceOf[AnyRef]
+      }
 
-     
-    private def addObjectPair(key: String, value: Any, result: JSONObject) {
-        println("Circular reference? " + parents.contains(value))
-        if (!parents.contains(value)) {
-            result += (key -> jsonValue(value))
-        }
+      value match {
+        case (s:String) => value
+        case (i:Integer) => value
+        case (l:java.lang.Long) => value
+        case (f:java.lang.Float) => value
+        case (s:java.lang.Short) => value
+          case (b:java.lang.Byte) => value
+        case (b:java.lang.Boolean) => value
+        case null => value                   
+        case seq: Seq[Any] => createJSONArray(seq, seen)
+        case set: Set[Any] => createJSONArray(set, seen)
+        case a: AnyRef => createJSONObject(a, None, None, seen)
+      }
     }
-         
-    private def addArrayValue(value: Any, result: JSONArray) {
-        println("Circular reference? " + parents.contains(value))
-        if (!parents.contains(value)) {
-            result += jsonValue(value)
-        }
-    }    
-
-      
 }
