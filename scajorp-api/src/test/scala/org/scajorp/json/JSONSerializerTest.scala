@@ -32,7 +32,7 @@ class JSONSerializerTest {
     }
     
     @Test
-    def poso_circular() {
+    def poso_circular_no_throw() {
         val result = JSONSerializer.serialize(principal)
         println ("---- result" + result)
         assertEquals("{\"jsonClass\":\"org.scajorp.dummies.circular.Principal\",\"name\":\"God\"," +

@@ -20,7 +20,13 @@ class CircularReferenceException(message : String) extends Exception(message)
  * @author Derek Chen-Becker
  */
 object JSONSerializer {
-    
+    var throwOnCircularRefs = false
+
+  def handleCircularRef (msg : String) = {
+    if (throwOnCircularRefs) {
+      throw new CircularReferenceException(msg)
+    }
+  }
     
     val class_literal = "jsonClass"
     
@@ -92,13 +98,25 @@ object JSONSerializer {
     
     private def createJSONObject(map: Map[String,Any], seen : Set[Any]): JSONObject = {
         val result = new JSONObject()
-        map.foreach((pair) => if (!seen.contains(pair._2)) result += (pair._1 -> jsonValue(pair._2, seen)))
+        map.foreach({case (key,value) =>
+	  if (seen.contains(value)) {
+	    handleCircularRef("Circular reference on " + key + ", " + value)
+	  } else {
+	    result += (key -> jsonValue(value, seen))
+	  }
+	})
         return result
     }
                 
     private def createJSONArray(col: Collection[Any], seen : Set[Any]): JSONArray = {
         val result = new JSONArray()
-        col.foreach(value => if (!seen.contains(value)) result+= jsonValue(value, seen))
+        col.foreach(value => {
+	  if (seen.contains(value)) {
+	    handleCircularRef("Circular ref in collection on value " + value)
+	  } else {
+	    result += jsonValue(value, seen)
+	  }
+	})
         return result
     }
 
