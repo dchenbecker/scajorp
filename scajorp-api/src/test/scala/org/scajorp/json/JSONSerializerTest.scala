@@ -42,6 +42,21 @@ class JSONSerializerTest {
                            "]}", result)
     }
 
+    @Test
+    def poso_circular_throw() {
+      try {
+	JSONSerializer.throwOnCircularRefs = true
+        val result = JSONSerializer.serialize(principal)
+	fail("Exception should have been thrown on circular reference")
+      } catch {
+	case cre : CircularReferenceException => "test" //nop
+	case e : Exception => fail("Unknown exception: " + e.getMessage())
+      } finally {
+	JSONSerializer.throwOnCircularRefs = false
+      }
+    }
+
+
     
     /* ----- Collection tests ----- */
     
