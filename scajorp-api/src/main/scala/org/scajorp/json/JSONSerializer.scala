@@ -78,14 +78,14 @@ object JSONSerializer {
      *
      * @return the JSONObject
      */  
-    private def processPOSO(poso: AnyRef,  includes : Option[Set[String]], excludes : Option[Set[String]], seen: Set[Any]): TJSONWriter = {        
+    private def processPOSO(poso: AnyRef,  includes : Option[Set[String]], excludes : Option[Set[String]], seen: Set[Any]): TJSONSerializable = {        
         seen += poso
         val fieldMap = getFieldsMap(poso, includes, excludes)
         return processCollection(fieldMap, seen)
     }
 
   
-    private def processCollection(collection: Collection[Any], seen : Set[Any]): TJSONWriter = {
+    private def processCollection(collection: Collection[Any], seen : Set[Any]): TJSONSerializable = {
         seen += collection    // TODO redundant when pojo, harmful?    
         val result =  collection match {
             case map : Map[String,Any] => createJSONObject(map, seen)

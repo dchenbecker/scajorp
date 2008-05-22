@@ -3,17 +3,23 @@ package org.scajorp.json
 /**
  * ATTENTION: This trait is only supposed to be mixed-in/extended by JSONObject/JSONArray.
  * Its sole purpose is to turn either into a valid JSON string by overriding
- * their toString() method. TJSONWriter does not know how to process anything
+ * their toString() method. TJSONSerializable does not know how to process anything
  * but JSONObjects/JSONArrays and AnyVals. Another class (JSONSerializer) is 
  * therefore needed to create proper JSONObjects and JSONArrays.
  * 
  * @author Marco Behler 
  * @see JSONSerializer
  */
-trait TJSONWriter {
+
+import java.io.OutputStream
+import java.io.OutputStreamWriter
+
+trait TJSONSerializable {
     
     private val builder = new StringBuilder
  
+    val default_encoding = "UTF-8"
+    
     var opening_literal :String = _  // { or [
     
     var closing_literal :String = _ // } or [
@@ -22,6 +28,13 @@ trait TJSONWriter {
     override def toString() = {  
         resetBuilder()
         serialize()        
+    }
+    
+    def toOutputStream(outputStream: OutputStream) {
+        val writer = new OutputStreamWriter(outputStream, default_encoding)    
+        val json = toString()        
+        writer.write(json, 0, json.length)
+        writer.flush() // never forget to flush!!
     }
       
     private def serialize():String = {
@@ -72,25 +85,20 @@ trait TJSONWriter {
         appendComma()
     }
 
-    private def appendComma() {
-        builder.append(",")
-    }
+    private def appendComma() = builder.append(",")
+            
     
-    private def appendSeparator() {
-        builder.append(":")
-    }
+    private def appendSeparator() = builder.append(":")
+        
 
-    private def appendOpening() {
-        builder.append(opening_literal)
-    }
+    private def appendOpening() = builder.append(opening_literal)
+            
     
-    private def appendClosing() {
-        deleteLastComma().append(closing_literal)
-    }
-    
-    private def deleteLastComma() = {
-        builder.deleteCharAt(builder.length -1)        
-    }
+    private def appendClosing() = deleteLastComma().append(closing_literal)
+        
+        
+    private def deleteLastComma() = builder.deleteCharAt(builder.length -1)        
+            
         
     private def resetBuilder() {        
         if (builder.length() > 1) builder.delete(0, builder.length() - 1)        
