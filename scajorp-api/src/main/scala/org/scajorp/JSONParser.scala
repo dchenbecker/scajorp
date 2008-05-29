@@ -1,32 +1,41 @@
 package org.scajorp
 
 import java.lang.reflect.Method
+import java.io.{BufferedReader,Reader}
+
+import scala.util.parsing.json.JSON
 
 
-import scala.util.parsing.combinator.JavaTokenParsers
-
-
-class JSONParser extends JavaTokenParsers {
+object JSONParser {
+  def resolveType(input: List[_]): Any = {
+    var objMap = Map[String, Any]()
     
-    def obj: Parser[Map[String, Any]] =  "{"~> repsep(member, ",") <~"}" ^^ (Map() ++ _)
- 
-    def arr: Parser[List[Any]] = "["~> repsep(value, ",") <~"]"
-  
-    def member: Parser[(String, Any)] = 
-      stringLiteral~":"~value ^^ 
-        { case name~":"~value => (name, value) }
-  
-    
-    def value: Parser[Any] = (
-        obj
-        | arr
-        | stringLiteral
-        | floatingPointNumber ^^ (_.toInt)
-        | "null"  ^^ (x => null)
-        | "true"  ^^ (x => true)
-        | "false" ^^ (x => false)
-    )
-import scala.collection.Map
+    if (input.forall { 
+      case (key: String, value: List[_]) =>
+        objMap += (key -> resolveType(value))
+        true
+      case (key : String, value : Any) =>
+        objMap += (key -> value)
+        true
+      case _ => false
+    }) objMap
+    else
+      input
+  }
+
+  def parseAll (input : Reader) = {
+    def readLines (in : BufferedReader, builder : StringBuilder) : String = in.readLine match {
+      case null => builder.toString
+      case data : String => readLines(in, builder.append(data))
+    }
+
+    val stringData = readLines(new BufferedReader(input), new StringBuilder)
+
+    JSON.parse(stringData) match {
+      case Some(x) => Some(resolveType(x))
+      case None => None
+    }
+  } 
     
     /**
      * Takes the given map representing a JSON Object and uses the map attributes to instantiate
@@ -37,6 +46,8 @@ import scala.collection.Map
      * 
      * @return The instantiated class or None if the class was not instantiable.
      */
+  import scala.collection.Map
+
     def resolve(jsonObject: Map[String, Any]): Option[Object] = jsonObject.get("jsonClass") match {
         case Some(className: String) => createClassInstance(className, jsonObject.filterKeys(_ != "jsonClass"))
         case _ => None

@@ -7,8 +7,6 @@ import org.junit.Assert._
 
 class JSONParserTest {
 
-    val jsonParser = new JSONParser
-
     var jsonObject: Map[String, Any] = _
 
 
@@ -27,7 +25,7 @@ class JSONParserTest {
 
     @Test
     def resolveObject() {
-        jsonParser.resolve(jsonObject) match {
+        JSONParser.resolve(jsonObject) match {
             case Some(user) => assertNotNull("Error while creating user occurred", user)
             case None => fail("Resolving error")
         }
@@ -38,7 +36,7 @@ class JSONParserTest {
 
     @Test
     def assignBooleanValue() {
-            jsonParser.resolve(jsonObject) match {
+            JSONParser.resolve(jsonObject) match {
                 case Some(user) => assertEquals(true, user.asInstanceOf[UserDummy].married)
                 case None => fail("Resolving error")
         }
@@ -46,7 +44,7 @@ class JSONParserTest {
 
     @Test
     def assignIntegerValue() {
-            jsonParser.resolve(jsonObject) match {
+            JSONParser.resolve(jsonObject) match {
                 case Some(user) => assertEquals(99, user.asInstanceOf[UserDummy].getAge)
                 case None => fail("Resolving error")
         }
@@ -54,7 +52,7 @@ class JSONParserTest {
 
     @Test
     def assignStringValue() {
-            jsonParser.resolve(jsonObject) match {
+            JSONParser.resolve(jsonObject) match {
                 case Some(user) => assertEquals("Johnny", user.asInstanceOf[UserDummy].name)
                 case None => fail("Resolving error")
         }
@@ -63,7 +61,7 @@ class JSONParserTest {
     @Test
     def assignPrivateValues() {
           jsonObject += ("loverCount" -> 20)
-          jsonParser.resolve(jsonObject) match {
+          JSONParser.resolve(jsonObject) match {
                 case Some(user) => assertEquals(5, user.asInstanceOf[UserDummy].getLoverCount)
                 case None => fail("Resolving error")
         }
@@ -72,7 +70,7 @@ class JSONParserTest {
     @Test
     def assignNonExistingValue() {
             jsonObject += ("nonExistingField" -> 99)
-            jsonParser.resolve(jsonObject) match {
+            JSONParser.resolve(jsonObject) match {
                 case Some(user) => assertNotNull("Error while creating user occurred", user)
                 case None => fail("Resolving error")
         }
@@ -90,7 +88,7 @@ class JSONParserTest {
                            "zip" -> "12345")
       jsonObject += ("address" -> addressMap)
       //println("User = " + jsonObject)
-      jsonParser.resolve(jsonObject) match {
+      JSONParser.resolve(jsonObject) match {
         case Some(user : UserDummy) => {
           assertNotNull("Error resolving nested object", user.address)
           assertEquals("12345", user.address.zip)
@@ -104,7 +102,7 @@ class JSONParserTest {
       val byteMap = List[Double](0xde, 0xad, 0xbe, 0xef)
       jsonObject += ("favoriteBytes" -> byteMap)
       //println("User = " + jsonObject)
-      jsonParser.resolve(jsonObject) match {
+      JSONParser.resolve(jsonObject) match {
         case Some(user : UserDummy) => {
           assertNotNull("Error resolving nested byte array", user.favoriteBytes)
           assertEquals(4, user.favoriteBytes.size)
@@ -118,7 +116,7 @@ class JSONParserTest {
       val shortMap = List[Double](384, 768)
       jsonObject += ("favoriteShorts" -> shortMap)
       //println("User = " + jsonObject)
-      jsonParser.resolve(jsonObject) match {
+      JSONParser.resolve(jsonObject) match {
         case Some(user : UserDummy) => {
           assertNotNull("Error resolving nested short array", user.favoriteShorts)
           assertEquals(2, user.favoriteShorts.size)
@@ -133,7 +131,7 @@ class JSONParserTest {
       val luckyNumbersMap = List[Double](11, 42, 1776)
       jsonObject += ("luckyNumbers" -> luckyNumbersMap)
       //println("User = " + jsonObject)
-      jsonParser.resolve(jsonObject) match {
+      JSONParser.resolve(jsonObject) match {
         case Some(user : UserDummy) => {
           assertNotNull("Error resolving nested int array", user.luckyNumbers)
           assertEquals(3, user.luckyNumbers.size)
@@ -147,7 +145,7 @@ class JSONParserTest {
       val longMap = List[Double](123678912, 987654321)
       jsonObject += ("favoriteLongs" -> longMap)
       //println("User = " + jsonObject)
-      jsonParser.resolve(jsonObject) match {
+      JSONParser.resolve(jsonObject) match {
         case Some(user : UserDummy) => {
           assertNotNull("Error resolving nested long array", user.favoriteLongs)
           assertEquals(2, user.favoriteLongs.size)
@@ -162,7 +160,7 @@ class JSONParserTest {
       val floatMap = List[Double](3.14159, 1.21, 1.11111111)
       jsonObject += ("favoriteFloats" -> floatMap)
       //println("User = " + jsonObject)
-      jsonParser.resolve(jsonObject) match {
+      JSONParser.resolve(jsonObject) match {
         case Some(user : UserDummy) => {
           assertNotNull("Error resolving nested float array", user.favoriteFloats)
           assertEquals(3, user.favoriteFloats.size)
@@ -177,7 +175,7 @@ class JSONParserTest {
       val doubleMap = List[Double](7.5462, 12.443, 8.2343, -0.112)
       jsonObject += ("favoriteDoubles" -> doubleMap)
       //println("User = " + jsonObject)
-      jsonParser.resolve(jsonObject) match {
+      JSONParser.resolve(jsonObject) match {
         case Some(user : UserDummy) => {
           assertNotNull("Error resolving nested double array", user.favoriteDoubles)
           assertEquals(4, user.favoriteDoubles.size)
@@ -192,7 +190,7 @@ class JSONParserTest {
       val charMap = List[String]("W", "h", "a", "t", "?")
       jsonObject += ("favoriteChars" -> charMap)
       //println("User = " + jsonObject)
-      jsonParser.resolve(jsonObject) match {
+      JSONParser.resolve(jsonObject) match {
         case Some(user : UserDummy) => {
           assertNotNull("Error resolving nested char array", user.favoriteChars)
           assertEquals(5, user.favoriteChars.size)
@@ -207,7 +205,7 @@ class JSONParserTest {
       val stringMap = List[String]("What", "is", "this", "?")
       jsonObject += ("favoriteStrings" -> stringMap)
       println("User = " + jsonObject)
-      jsonParser.resolve(jsonObject) match {
+      JSONParser.resolve(jsonObject) match {
         case Some(user : UserDummy) => {
           assertNotNull("Error resolving nested string array", user.favoriteStrings)
           assertEquals(4, user.favoriteStrings.size)
