@@ -50,14 +50,14 @@ class MockHttpServletRequest extends HttpServletRequest {
   var remoteHost = null
   var remoteAddr = null
   var locale = Locale.getDefault
-  var reader: BufferedReader = new BufferedReader(new StringReader("{\"jsonrpc\": \"2.0\", \"method\": \"calculator.subtract\", \"params\": [42, 23], \"id\": 1}"))
+  var reader: BufferedReader = new BufferedReader(new StringReader("{\"jsonrpc\": \"2.0\", \"method\": \"calculator.sum\", \"params\": [10, 9], \"id\": 5}"))
   var serverPort = 0
   var serverName = null
   var scheme = "http"
   var protocol = "http 1.0"
   var parameterMap: scala.collection.jcl.HashMap[String, String] = 
     new scala.collection.jcl.HashMap[String, String](new java.util.HashMap)
-  val sbis = new StringBufferInputStream("{\"jsonrpc\": \"2.0\", \"method\": \"calculator.subtract\", \"params\": [42, 23], \"id\": 1}")
+  val sbis = new StringBufferInputStream("{\"jsonrpc\": \"2.0\", \"method\": \"calculator.sum\", \"params\": [10, 9], \"id\": 5}")
   var inputStream: ServletInputStream = new MockServletInputStream(sbis)
   var contentType = null
   var contentLength = 0

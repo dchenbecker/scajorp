@@ -22,12 +22,13 @@ class ScajorpServletTest {
     val os = new MockServletOutputStream(new ByteArrayOutputStream())
     
     // already hardcoded into mockhttp servlet request
-    // val request = {\"jsonrpc\": \"2.0\", \"method\": \"subtract\", \"params\": [42, 23], \"id\": 1}
+    // val request = {\"jsonrpc\": \"2.0\", \"method\": \"sum\", \"params\": [10, 9], \"id\": 5}
     
     val response = "{\"jsonrpc\":\"2.0\",\"result\":19,\"id\":1}"
     
     @Test
     def simulateRequest() {
+        assertEquals("", os.os.toString())
         val req = new MockHttpServletRequest
         val resp = new MockHttpServletResponse(new PrintWriter(os), os)
         scajorpServlet.doPost(req, resp)        

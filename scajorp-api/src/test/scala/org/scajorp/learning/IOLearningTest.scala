@@ -22,8 +22,7 @@ class IOLearningTest {
     var os = new ByteArrayOutputStream()    
     val osWriter = new OutputStreamWriter(os, "UTF-8")    
     osWriter.write(name, 0, name.length)
-    osWriter.flush() // never forget to flush!!
-    println("Content " + os + " Size: " + os.size)
+    osWriter.flush() // never forget to flush!!    
     
   }
 }

@@ -16,7 +16,7 @@ class ScajorpApplication {
     val methodRegistry = new HashMap[String, Method]
   
     /**
-    * Executes a JSONRequest's specified method with its specified parameters.
+    * Executes a JSONRequest's method with its parameters.
     *
     * @return the method's result
     */
@@ -41,13 +41,13 @@ class ScajorpApplication {
     * @return the method's result
     */
     private def invoke(methodName: String, parameters: Array[AnyRef]): Any = {
-        def doInvoke(method: Method) = {            
+        def doInvoke(method: Method) = {                             
             val instance = method.getDeclaringClass().newInstance()            
             method.invoke(instance, parameters)
         }
         val result = methodRegistry.get(methodName) match {
             case Some(method: Method) => doInvoke(method)
-            case None => error("There is no method with name[=" + methodName + "]")
+            case None => error("There is no method with name[=" + methodName + "] registered with this service.")
         }
         result
     }
