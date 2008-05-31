@@ -21,9 +21,10 @@ class ScajorpApplicationTest {
     val jsonRequest = new JSONRequest("2.0", "calculator.sum", List(4,5), 1 )
     
     val invalidJsonRequest = new JSONRequest("2.0", "calculator.sum", List(4,5,6), 1)
+
+    // TODO makeover
     
-    
-    @Before
+   /* @Before
     def setUp() {
         application.register("calculator", classOf[Calculator])
         assertEquals(true, application.methodRegistry.contains("calculator.sum"))
@@ -40,7 +41,7 @@ class ScajorpApplicationTest {
     def execute_wrongParams() {
         application.register("calculator", classOf[Calculator])
         application.execute(invalidJsonRequest)         
-    }
+    }*/
 
     
 }

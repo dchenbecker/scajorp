@@ -24,7 +24,10 @@ class ScajorpServletTest {
     // already hardcoded into mockhttp servlet request
     // val request = {\"jsonrpc\": \"2.0\", \"method\": \"sum\", \"params\": [10, 9], \"id\": 5}
     
-    val response = "{\"jsonrpc\":\"2.0\",\"result\":19,\"id\":1}"
+   // val response = "{\"jsonrpc\":\"2.0\",\"result\":19,\"id\":1}"
+
+    val response = "{\"id\":1,\"jsonrpc\":\"2.0\",\"result\":19}"
+
     
     @Test
     def simulateRequest() {

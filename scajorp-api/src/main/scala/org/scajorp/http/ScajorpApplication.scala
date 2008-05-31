@@ -9,10 +9,14 @@ package org.scajorp.http
 
 import java.lang.reflect.Method
 import org.scajorp.json.JSONRequest
+import org.scajorp.json.JSONResponse
 import scala.collection.mutable.HashMap
 
 class ScajorpApplication {
-    
+
+
+    val rpc_version = "2.0"
+
     val methodRegistry = new HashMap[String, Method]
   
     /**
@@ -20,8 +24,9 @@ class ScajorpApplication {
     *
     * @return the method's result
     */
-    def execute(jsonRequest: JSONRequest): Any = {        
-        invoke(jsonRequest.method, jsonRequest.parametersToArray)                
+    def execute(jsonRequest: JSONRequest): JSONResponse = {        
+        val result = invoke(jsonRequest.method, jsonRequest.parametersToArray)
+        return new JSONResponse(rpc_version, result, 1)
     }
     
     /**    

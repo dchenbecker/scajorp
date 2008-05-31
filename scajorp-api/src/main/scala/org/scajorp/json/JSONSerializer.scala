@@ -169,7 +169,13 @@ object JSONSerializer {
 
         val fieldMap = scala.collection.mutable.Map.empty[String, Any]
 
-        fieldMap += (class_literal -> poso.getClass().getName())
+        // hack, will be removed soon
+        val className = poso.getClass().getName()
+        if (className != "org.scajorp.json.JSONResponse") {
+            fieldMap += (class_literal -> className)    
+        }
+        
+
 
         for (field <- fields) {
             field.setAccessible(true)

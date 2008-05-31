@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import org.scajorp.json.JSONRequest
+import org.scajorp.json.JSONResponse
+import org.scajorp.json.JSONSerializer
 import org.scajorp.JSONParser
 
 
@@ -27,8 +29,10 @@ class ScajorpServlet extends HttpServlet{
       app.register("calculator", classOf[Calculator])
       
       val result = app.execute(jsonRequest)
-      
-      val response = "{\"jsonrpc\":\"2.0\",\"result\":"+result+",\"id\":1}"
+
+      val response = JSONSerializer.serialize(result)
+      //val response = "{\"jsonrpc\":\"2.0\",\"result\":"+result+",\"id\":1}"
+
       
       resp.getWriter().write(response)
       resp.getWriter().flush()
@@ -42,11 +46,11 @@ class ScajorpServlet extends HttpServlet{
   // todo refactor to JSONRequest constructor
    private def newRequest(map: Map[String,Any]): JSONRequest = {              
        val version = map.get("jsonrpc") match {
-          case Some(v: String) => v
+          case Some(s: String) => s
           case _ => error("No version specified for request. Example: {\"jsonrpc\": \"2.0\"...}")
         }
         val method = map.get("method") match {
-            case Some(m: String) => m
+            case Some(s: String) => s
             case _ => error("No method specified for request. Example: {...\"method\": \"subtract\"...}")
         }
         val params = map.get("params") match {
@@ -55,8 +59,6 @@ class ScajorpServlet extends HttpServlet{
         }
         val id = map.get("id") match {
             case Some(i : Int) => i
-            case Some(f: Float) => f.toInt
-            case Some(d: Double) => d.toInt
             case _ => error("No id specified for request. Example: ...\"id\": 1}")
         }          
         new JSONRequest(version, method, params, id)
