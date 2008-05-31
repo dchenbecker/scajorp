@@ -4,10 +4,37 @@ import java.lang.reflect.Method
 import java.io.{BufferedReader,Reader}
 
 import scala.util.parsing.json.JSON
+import scala.util.parsing.combinator.JavaTokenParsers
 
 
-object JSONParser {
-  def resolveType(input: List[_]): Any = {
+object JSONParser extends JavaTokenParsers {
+
+
+    def obj: Parser[Map[String, Any]] =
+        "{"~> repsep(member, ",") <~"}" ^^ (Map() ++ _)
+    def arr: Parser[List[Any]] =
+        "["~> repsep(value, ",") <~"]"
+        
+    def member: Parser[(String, Any)] =
+        (stringLiteral ^^  (x => stripQuotes(x)))~":"~value ^^
+            { case name~":"~value => (name, value) }
+
+    def value: Parser[Any] = (
+        obj
+        | arr
+        | stringLiteral ^^  (x => stripQuotes(x))
+        | floatingPointNumber ^^ (_.toInt)
+        | "null"  ^^ (x => null)
+        | "true"  ^^ (x => true)
+        | "false" ^^ (x => false)
+     )
+  
+    private def stripQuotes(x: String):String = {
+        return x.substring(1, x.length -1)
+    }
+
+
+  /*def resolveType(input: List[_]): Any = {
     var objMap = Map[String, Any]()
     
     if (input.forall { 
@@ -21,21 +48,21 @@ object JSONParser {
     }) objMap
     else
       input
-  }
+  }*/
 
-  def parseAll (input : Reader) = {
-    def readLines (in : BufferedReader, builder : StringBuilder) : String = in.readLine match {
-      case null => builder.toString
-      case data : String => readLines(in, builder.append(data))
-    }
-
-    val stringData = readLines(new BufferedReader(input), new StringBuilder)
-
-    JSON.parse(stringData) match {
-      case Some(x) => Some(resolveType(x))
-      case None => None
-    }
-  } 
+//  def parseAll (input : Reader) = {
+//    def readLines (in : BufferedReader, builder : StringBuilder) : String = in.readLine match {
+//      case null => builder.toString
+//      case data : String => readLines(in, builder.append(data))
+//    }
+//
+//    val stringData = readLines(new BufferedReader(input), new StringBuilder)
+//
+//    JSON.parse(stringData) match {
+//      case Some(x) => Some(resolveType(x))
+//      case None => None
+//    }
+//  }
     
     /**
      * Takes the given map representing a JSON Object and uses the map attributes to instantiate

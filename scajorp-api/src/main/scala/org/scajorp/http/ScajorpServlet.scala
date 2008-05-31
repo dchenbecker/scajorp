@@ -34,16 +34,13 @@ class ScajorpServlet extends HttpServlet{
       resp.getWriter().flush()
   }
   
-  def parseRequest(req: HttpServletRequest): JSONRequest = {    
-    JSONParser.parseAll(req.getReader()) match {      
-      case Some(result : Map[String,Any]) => newRequest(result)         		
-      case _ => error("Req[" + req + "] is not a valid JSON request. Check the syntax." )
-    }
+  def parseRequest(req: HttpServletRequest): JSONRequest = {
+      val requestMap = JSONParser.parseAll(JSONParser.obj,req.getReader()).get
+      return newRequest(requestMap)
   }
   
   // todo refactor to JSONRequest constructor
-   private def newRequest(map: Map[String,Any]): JSONRequest = {
-       println("Request Map ----> " + map)
+   private def newRequest(map: Map[String,Any]): JSONRequest = {              
        val version = map.get("jsonrpc") match {
           case Some(v: String) => v
           case _ => error("No version specified for request. Example: {\"jsonrpc\": \"2.0\"...}")
