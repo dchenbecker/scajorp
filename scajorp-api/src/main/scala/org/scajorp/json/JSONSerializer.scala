@@ -20,14 +20,9 @@ class CircularReferenceException(message: String) extends Exception(message)
  * @author Derek Chen-Becker
  */
 object JSONSerializer {
+    
     var throwOnCircularRefs = false
-
-    def handleCircularRef(msg: String) = {
-        if (throwOnCircularRefs) {
-            throw new CircularReferenceException(msg)
-        }
-    }
-
+    
     val class_literal = "jsonClass"
 
     /**
@@ -121,6 +116,11 @@ object JSONSerializer {
         return result
     }
 
+    def handleCircularRef(msg: String) = {
+        if (throwOnCircularRefs) {
+            throw new CircularReferenceException(msg)
+        }
+    }
 
 
     /**
@@ -175,12 +175,12 @@ object JSONSerializer {
             fieldMap += (class_literal -> className)    
         }
         
-
-
         for (field <- fields) {
             field.setAccessible(true)
             fieldMap += field.getName() -> field.get(poso)
         }
         fieldMap
     }
+
+ 
 }

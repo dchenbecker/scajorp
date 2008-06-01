@@ -15,7 +15,7 @@ import scala.collection.mutable.HashMap
 class ScajorpApplication {
 
 
-    val rpc_version = "2.0"
+    val RPC_VERSION = "2.0"
 
     val methodRegistry = new HashMap[String, Method]
   
@@ -26,7 +26,7 @@ class ScajorpApplication {
     */
     def execute(jsonRequest: JSONRequest): JSONResponse = {        
         val result = invoke(jsonRequest.method, jsonRequest.parametersToArray)
-        return new JSONResponse(rpc_version, result, 1)
+        return new JSONResponse(RPC_VERSION, result, 1)
     }
     
     /**    
@@ -40,8 +40,8 @@ class ScajorpApplication {
     }
     
     /**
-    * Invokes a method that is registered with this application. If not, an error
-    * message will be printed out.
+    * Invokes a method that is registered with this application. If there is no such message,
+    * a runtime error will be thrown.
     *
     * @return the method's result
     */
