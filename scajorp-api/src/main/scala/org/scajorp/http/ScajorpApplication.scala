@@ -12,33 +12,42 @@ import org.scajorp.json.JSONRequest
 import org.scajorp.json.JSONResponse
 import scala.collection.mutable.HashMap
 
-class ScajorpApplication {
+abstract class ScajorpApplication {
 
-
-    val RPC_VERSION = "2.0"
+    val rpc_version = "2.0"
 
     val methodRegistry = new HashMap[String, Method]
-  
+
+    /** constructor **/
+    init()
+
     /**
     * Executes a JSONRequest's method with its parameters.
     *
     * @return the method's result
     */
-    def execute(jsonRequest: JSONRequest): JSONResponse = {        
+    def execute(jsonRequest: JSONRequest): JSONResponse = {
         val result = invoke(jsonRequest.method, jsonRequest.parametersToArray)
-        return new JSONResponse(RPC_VERSION, result, 1)
+        return new JSONResponse(rpc_version, result, 1)
     }
-    
+
+
+    /**
+    * Initialisation method. Override this method in your subclass and register
+    * any (p)lain (o)ld (s)cala (o)bjects in it. 
+    */
+    def init(): Unit
+
     /**    
     * Adds all public methods of the specified class to the application methodRegistry.
     * A methodRegistry entry will be in the form of: 
     * "className.methodname" => "calculator.sum""    
     */
-    def register(className: String, cls: Class[_]) {
-        val methods = cls.getDeclaredMethods()        
-        methods.foreach(method => methodRegistry.put(className + "." + method.getName(), method))                                
+    protected def register(className: String, cls: Class[_]) {
+        val methods = cls.getDeclaredMethods()
+        methods.foreach(method => methodRegistry.put(className + "." + method.getName(), method))
     }
-    
+
     /**
     * Invokes a method that is registered with this application. If there is no such message,
     * a runtime error will be thrown.
@@ -46,8 +55,8 @@ class ScajorpApplication {
     * @return the method's result
     */
     private def invoke(methodName: String, parameters: Array[AnyRef]): Any = {
-        def doInvoke(method: Method) = {                             
-            val instance = method.getDeclaringClass().newInstance()            
+        def doInvoke(method: Method) = {
+            val instance = method.getDeclaringClass().newInstance()
             method.invoke(instance, parameters)
         }
         val result = methodRegistry.get(methodName) match {

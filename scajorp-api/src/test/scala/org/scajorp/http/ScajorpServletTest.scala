@@ -31,6 +31,7 @@ class ScajorpServletTest {
     
     @Test
     def simulateRequest() {
+        scajorpServlet.init(new MockServletConfig())
         assertEquals("", os.os.toString())
         val req = new MockHttpServletRequest
         val resp = new MockHttpServletResponse(new PrintWriter(os), os)

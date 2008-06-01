@@ -171,7 +171,7 @@ object JSONSerializer {
 
         // hack, will be removed soon
         val className = poso.getClass().getName()
-        if (className != "org.scajorp.json.JSONResponse") {
+        if (className != classOf[JSONResponse].getName()) {
             fieldMap += (class_literal -> className)    
         }
         

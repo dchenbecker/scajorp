@@ -18,7 +18,7 @@ import java.io.StringReader
 class ScajorpApplicationTest {
       
     
-    val application = new ScajorpApplication()
+    val application = new BogusApplication()
 
 
     val requestReader = new BufferedReader(new StringReader("{\"jsonrpc\": \"2.0\", \"method\": \"calculator.sum\", \"params\": [4, 5], \"id\": 5}")) 
@@ -29,20 +29,18 @@ class ScajorpApplicationTest {
        
     @Before
     def setUp() {
-        application.register("calculator", classOf[Calculator])
+    //  application.register("calculator", classOf[Calculator])
         assertEquals(true, application.methodRegistry.contains("calculator.sum"))
     }
         
     @Test
     def execute() {
-        application.register("calculator", classOf[Calculator])
         val response = application.execute(jsonRequest)
         assertEquals(9, response.result)
     }
     
     @Test{val expected = classOf[IllegalArgumentException]}
-    def execute_wrongParams() {
-        application.register("calculator", classOf[Calculator])
+    def execute_wrongParams() {        
         application.execute(invalidJsonRequest)         
     }
 

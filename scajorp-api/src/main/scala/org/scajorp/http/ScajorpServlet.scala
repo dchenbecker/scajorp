@@ -16,25 +16,23 @@ import org.scajorp.json.JSONResponse
 
 
 
+class ScajorpServlet extends HttpServlet {
 
 
-class ScajorpServlet extends HttpServlet{
+    val applicationFactory: TApplicationFactory = new ContextParamApplicationFactory()
     
-  override def doPost(req: HttpServletRequest, resp: HttpServletResponse) {
-      
-      val jsonRequest = new JSONRequest(req.getReader())
-
-      //testing, will be removed later
-      val app = new ScajorpApplication()
-      app.register("calculator", classOf[Calculator])
-      //
-
-      val jsonResponse = app.execute(jsonRequest)
-      
-      jsonResponse.toWriter(resp.getWriter())
-      
-  }
-  
-
     
+    override def doPost(req: HttpServletRequest, resp: HttpServletResponse) {
+        
+        val jsonRequest = new JSONRequest(req.getReader())
+
+        val application = applicationFactory.createApplication(getServletConfig())
+        
+        val jsonResponse = application.execute(jsonRequest)
+
+        jsonResponse.toWriter(resp.getWriter())
+
+    }
+
+
 }
