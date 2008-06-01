@@ -28,8 +28,7 @@ class ScajorpApplicationTest {
     val invalidJsonRequest = new JSONRequest(new BufferedReader(new StringReader("{\"jsonrpc\": \"2.0\", \"method\": \"calculator.sum\", \"params\": [10, 9,6], \"id\": 5}")))
        
     @Before
-    def setUp() {
-    //  application.register("calculator", classOf[Calculator])
+    def setUp() {    
         assertEquals(true, application.methodRegistry.contains("calculator.sum"))
     }
         
@@ -42,6 +41,16 @@ class ScajorpApplicationTest {
     @Test{val expected = classOf[IllegalArgumentException]}
     def execute_wrongParams() {        
         application.execute(invalidJsonRequest)         
+    }
+
+    @Test
+    def listMethods() {
+        val request = "{\"jsonrpc\": \"2.0\", \"method\": \"system.listMethods\", \"params\": [], \"id\": 1}";
+        val reader = new BufferedReader(new StringReader(request))
+        val jsonRequest = new JSONRequest(reader)
+        val response = application.execute(jsonRequest)
+        assertEquals("{\"id\":1,\"jsonrpc\":\"2.0\",\"result\":[\"calculator.sum\"]}", response.toJSONString())
+
     }
 
     

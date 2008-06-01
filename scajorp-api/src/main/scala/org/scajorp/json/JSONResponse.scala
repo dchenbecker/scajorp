@@ -16,6 +16,9 @@ import java.io.Writer
 */
 class JSONResponse(val jsonrpc: String, val result: Any, val id: Int) {
 
+
+    def toJSONString() = JSONSerializer.serialize(this)
+
     /**
     * First, serializes this response's data into a valid json string.
     * Afterwards, writes the string to a writer and flushes it.         

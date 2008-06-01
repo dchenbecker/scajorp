@@ -12,6 +12,7 @@ import org.scajorp.json.JSONRequest
 import org.scajorp.json.JSONResponse
 import scala.collection.mutable.HashMap
 
+
 abstract class ScajorpApplication {
 
     val rpc_version = "2.0"
@@ -27,7 +28,13 @@ abstract class ScajorpApplication {
     * @return the method's result
     */
     def execute(jsonRequest: JSONRequest): JSONResponse = {
-        val result = invoke(jsonRequest.method, jsonRequest.parametersToArray)
+        val result =
+            if (jsonRequest.systemList()) {
+                systemList()
+            }
+            else {
+                invoke(jsonRequest.method, jsonRequest.parametersToArray)
+            }                                      
         return new JSONResponse(rpc_version, result, 1)
     }
 
@@ -45,7 +52,7 @@ abstract class ScajorpApplication {
     */
     protected def register(className: String, cls: Class[_]) {
         val methods = cls.getDeclaredMethods()
-        methods.foreach(method => methodRegistry.put(className + "." + method.getName(), method))
+        methods.foreach(method => if (method.getName() != "$tag") methodRegistry.put(className + "." + method.getName(), method))        
     }
 
     /**
@@ -58,12 +65,19 @@ abstract class ScajorpApplication {
         def doInvoke(method: Method) = {
             val instance = method.getDeclaringClass().newInstance()
             method.invoke(instance, parameters)
-        }
+        }        
         val result = methodRegistry.get(methodName) match {
             case Some(method: Method) => doInvoke(method)
             case None => error("There is no method with name[=" + methodName + "] registered with this service.")
         }
         result
+    }
+
+    private def systemList(): List[String] = {
+         var result = List[String]()
+         methodRegistry.keys.foreach(value => result = result + value)
+         println("SYSTEM " + result)
+         result
     }
 
 }

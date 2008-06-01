@@ -41,6 +41,9 @@ class JSONRequest(reader: BufferedReader) {
         result
     }
 
+    def systemList() = method == "system.listMethods"
+    
+
     /* --- construction helpers ---*/
 
     /**
