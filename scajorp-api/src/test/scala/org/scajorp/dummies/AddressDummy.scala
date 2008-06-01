@@ -1,4 +1,4 @@
-package org.scajorp
+package org.scajorp.dummies
 
 class AddressDummy {
   var street : String = _

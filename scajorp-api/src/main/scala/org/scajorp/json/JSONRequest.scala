@@ -1,7 +1,6 @@
 package org.scajorp.json
 
 import java.io.BufferedReader
-import org.scajorp.JSONParser
 import scala.collection.mutable.ArrayBuffer
 
 

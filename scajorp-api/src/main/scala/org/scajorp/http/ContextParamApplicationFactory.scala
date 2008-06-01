@@ -14,10 +14,11 @@ import javax.servlet.ServletConfig
 
 class ContextParamApplicationFactory extends TApplicationFactory
 {
-	/**
-	 * context parameter name that must contain the class name of the application
-	 */
-	val application_class_param = "applicationClassName";
+    
+    /**
+    * context parameter name that must contain the class name of the application
+    */
+    val application_class_param = "applicationClassName";
 
 
     override def createApplication(config: ServletConfig): ScajorpApplication = {

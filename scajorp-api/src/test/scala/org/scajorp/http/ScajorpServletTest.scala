@@ -12,6 +12,7 @@ import org.junit.Before
 import org.junit.After
 import org.junit.Assert._
 
+import org.scajorp.http.mocks._
 import java.io.ByteArrayOutputStream
 import java.io.PrintWriter
 

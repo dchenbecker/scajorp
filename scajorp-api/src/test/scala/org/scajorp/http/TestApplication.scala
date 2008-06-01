@@ -1,5 +1,5 @@
 package org.scajorp.http
-
+import org.scajorp.http.mocks._
 /** 
 * Created by IntelliJ IDEA.
 * User: marco

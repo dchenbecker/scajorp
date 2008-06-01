@@ -5,10 +5,8 @@
  * and open the template in the editor.
  */
 
-package org.scajorp.http
+package org.scajorp.http.mocks
 
-
-// TODO will be deleted i.e. moved to test packages
 class Calculator {
   def sum(x: Int, y: Int) = x + y
 }

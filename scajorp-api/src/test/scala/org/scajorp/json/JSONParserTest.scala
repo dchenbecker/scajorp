@@ -1,9 +1,10 @@
-package org.scajorp
+package org.scajorp.json
 
 import org.junit.Test
 import org.junit.Before
 import org.junit.After
 import org.junit.Assert._
+import org.scajorp.dummies._
 
 class JSONParserTest {
 
@@ -14,7 +15,7 @@ class JSONParserTest {
 
     @Before
     def setUp():Unit = {
-        jsonObject = Map("jsonClass" -> "org.scajorp.UserDummy",
+        jsonObject = Map("jsonClass" -> "org.scajorp.dummies.UserDummy",
                                             "name" -> "Johnny",
                                              "age" -> 99,
                                              "married" -> true)
@@ -81,7 +82,7 @@ class JSONParserTest {
 
     @Test
     def assignNestedObject() {
-      val addressMap = Map("jsonClass" -> "org.scajorp.AddressDummy",
+      val addressMap = Map("jsonClass" -> "org.scajorp.dummies.AddressDummy",
                            "street" -> "123 Nowhere Lane",
                            "city" -> "Nowheretown",
                            "state" -> "Nothing",

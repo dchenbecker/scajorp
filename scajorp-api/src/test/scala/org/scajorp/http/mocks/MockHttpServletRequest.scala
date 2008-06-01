@@ -5,7 +5,7 @@
  * and open the template in the editor.
  */
 
-package org.scajorp.http
+package org.scajorp.http.mocks
 
 import scala.collection.mutable.HashMap
 import java.io.PrintWriter
