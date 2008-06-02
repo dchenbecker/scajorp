@@ -1,22 +1,23 @@
 package org.scajorp.json
 
 import java.io.BufferedReader
+import java.io.StringReader
+
 import scala.collection.mutable.ArrayBuffer
 
 
 /**
-*
-* Representation of a json request string. Example:
+* Scala representation of a json request string, which offers a couple of convenience
+* methods. Can be constructed from any String or BufferedReader.
 * 
-* {"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1}
-*
-* @param reader  a BufferedReader wrapping a valid json string
+* @param reader
+*               a BufferedReader wrapping a valid json string
 * 
 * @author Marco Behler
 */
 class JSONRequest(reader: BufferedReader) {
 
-    
+
     private val requestMap: Map[String, Any] = parse()
 
     val jsonrpc: String = getVersion()
@@ -26,6 +27,17 @@ class JSONRequest(reader: BufferedReader) {
     val params: Collection[Any] = getParams()
 
     val id: Int = getId()
+
+
+
+    /**
+    *  Secondary constructor.
+    *
+    *  @param json
+    *           a valid json string
+    */
+    def this(json: String) = this(new BufferedReader(new StringReader(json)))
+
 
 
     /**
@@ -41,25 +53,34 @@ class JSONRequest(reader: BufferedReader) {
         result
     }
 
-    def systemList() = method == "system.listMethods"
-    
-
-    /* --- construction helpers ---*/
 
     /**
-    * Turns the json string underlying this request's reader into a Map[String,Any]
+    * Request for system.listMethods?
+    * 
+    * @return true or false accordingly   
+    */
+    def systemList() = method == "system.listMethods"
+
+
+    /* --------------------------- */
+    /* --- construction helpers -- */
+    /* --------------------------- */
+
+
+    /**
+    * Turns the json string underlying this request's reader into a Map[String,Any].
     * 
     * @return a requestMap request map
     */
-    private def parse(): Map[String, Any] = {        
+    private def parse(): Map[String, Any] = {
         val map = JSONParser.parseAll(JSONParser.obj, reader).get
         println("[JSONRequest]: Parsed ==>" + map)
         map
     }
 
-    
+
     /**
-    * Tries to retrieve the version of the requestMap request.
+    * Tries to retrieve the version of the request.
     * 
     * @return the version number or a runtime error if none exists
     */
@@ -71,7 +92,7 @@ class JSONRequest(reader: BufferedReader) {
     }
 
     /**
-    * Tries to retrieve the method of the requestMap request.
+    * Tries to retrieve the method of the request.
     *
     * @return the method or a runtime error if none exists
     */
@@ -83,7 +104,7 @@ class JSONRequest(reader: BufferedReader) {
     }
 
     /**
-    * Tries to retrieve the parameters of the requestMap request.
+    * Tries to retrieve the parameters of the request.
     *
     * @return the parameters or a runtime error if none exist
     */
@@ -95,7 +116,7 @@ class JSONRequest(reader: BufferedReader) {
     }
 
     /**
-    * Tries to retrieve the id of the requestMap request.
+    * Tries to retrieve the id of the request.
     *
     * @return id or a runtime error if none exists
     */

@@ -24,13 +24,16 @@ object JSONSerializer {
     var throwOnCircularRefs = false
     
     val class_literal = "jsonClass"
-
+   
+    var prettyPrint = false // TODO revise
+    
     /**
     * Turns the given object into a JSON string.
     *
     * @return the JSON string
     */
     def serialize(obj: AnyRef): String = serializeInternal(obj, None, None)
+    
 
     /**
     *
@@ -63,7 +66,7 @@ object JSONSerializer {
             case collection: Collection[_] => processCollection(collection, seen)
             case _ => processPOSO(obj, includes, excludes, seen)
         }
-        jsonEntity.toString()
+        jsonEntity.toString(prettyPrint)
     }
 
     /**

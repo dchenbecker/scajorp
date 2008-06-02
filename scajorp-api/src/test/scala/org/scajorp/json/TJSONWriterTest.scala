@@ -99,4 +99,16 @@ class TJSONWriterTest {
         val result = jsonArray.toString
         assertEquals("[\"Barbara\",\"Fred\",[\"Tom\",\"Jones\"]]", result)
     }
+
+
+    /* ---- pretty print ---- */
+    @Test
+    def pretty_object(){
+         jsonObject += "name" -> "Dr. Cox"
+         jsonObject += "age" -> 44
+         val result = jsonObject.toString(true)         
+         assertEquals("{\n\t\"age\"\t: 44,\n\t\"name\"\t: \"Dr. Cox\"\n}", result)
+    }
+
+   
 }

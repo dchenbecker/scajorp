@@ -3,10 +3,8 @@ package org.scajorp.json
 import java.io.Writer
 
 /**
-*
-* Representation of a json response string. Example:
-*
-* {"jsonrpc": "2.0", "result": 19, "id": 1}
+* Scala representation of a json response string, which offers a couple of convenience
+* methods. Knows how to turn itself to a json String or output itself to a Writer.
 *
 * @param jsonrpc   a rpc version number
 * @param result    a result of type Any, i.e. AnyVal and AnyRef
@@ -17,15 +15,17 @@ import java.io.Writer
 class JSONResponse(val jsonrpc: String, val result: Any, val id: Int) {
 
 
-    def toJSONString() = JSONSerializer.serialize(this)
+    def toJSON(prettyPrint: Boolean) = {
+        if (prettyPrint) JSONSerializer.prettyPrint = true       
+        JSONSerializer.serialize(this) 
+    }
 
     /**
-    * First, serializes this response's data into a valid json string.
-    * Afterwards, writes the string to a writer and flushes it.         
+    * Transforms this object to a valid json string and outputs it to a writer.
+    * Flushes the writer afterwards!
     */
-    def toWriter(writer: Writer) {
-        val response = JSONSerializer.serialize(this)
-        writer.write(response)
+    def toWriter(writer: Writer, prettyPrint: Boolean) {
+        writer.write(this.toJSON(prettyPrint))
         writer.flush()
     }
 }

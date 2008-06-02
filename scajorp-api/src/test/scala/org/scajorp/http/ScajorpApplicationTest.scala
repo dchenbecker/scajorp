@@ -20,14 +20,13 @@ class ScajorpApplicationTest {
     
     val application = new BogusApplication()
 
-
-    val requestReader = new BufferedReader(new StringReader("{\"jsonrpc\": \"2.0\", \"method\": \"calculator.sum\", \"params\": [4, 5], \"id\": 5}"))
-
-    val systemListRequest = new JSONRequest(new BufferedReader(new StringReader("{\"jsonrpc\": \"2.0\", \"method\": \"system.listMethods\", \"params\": [], \"id\": 1}")))
-
-    val jsonRequest = new JSONRequest(requestReader)
+    val jsonRequest = new JSONRequest("{\"jsonrpc\": \"2.0\", \"method\": \"calculator.sum\", \"params\": [4, 5], \"id\": 5}")
     
-    val invalidJsonRequest = new JSONRequest(new BufferedReader(new StringReader("{\"jsonrpc\": \"2.0\", \"method\": \"calculator.sum\", \"params\": [10, 9,6], \"id\": 5}")))
+    val systemListRequest = new JSONRequest("{\"jsonrpc\": \"2.0\", \"method\": \"system.listMethods\", \"params\": [], \"id\": 1}")
+
+    val invalidJsonRequest = new JSONRequest("{\"jsonrpc\": \"2.0\", \"method\": \"calculator.sum\", \"params\": [10, 9,6], \"id\": 5}")
+    
+
        
     @Before
     def setUp() {    
@@ -48,7 +47,7 @@ class ScajorpApplicationTest {
     @Test
     def listMethods() {
         val response = application.execute(systemListRequest)
-        assertEquals("{\"id\":1,\"jsonrpc\":\"2.0\",\"result\":[\"calculator.sum\"]}", response.toJSONString())
+        assertEquals("{\"id\":1,\"jsonrpc\":\"2.0\",\"result\":[\"calculator.sum\"]}", response.toJSON(false))
     }
 
     

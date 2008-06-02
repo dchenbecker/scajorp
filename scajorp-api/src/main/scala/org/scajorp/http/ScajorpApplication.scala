@@ -19,6 +19,9 @@ abstract class ScajorpApplication {
 
     val methodRegistry = new HashMap[String, Method]
 
+    var prettyPrint = false
+
+
     /** constructor **/
     init()
 
@@ -39,6 +42,9 @@ abstract class ScajorpApplication {
     }
 
 
+    def enablePrettyResults() = (prettyPrint = true)
+
+        
     /**
     * Initialisation method. Override this method in your subclass and register
     * any (p)lain (o)ld (s)cala (o)bjects in it. 

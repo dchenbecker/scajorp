@@ -19,15 +19,23 @@ trait TJSONSerializable {
     private val builder = new StringBuilder
  
     val default_encoding = "UTF-8"
+
+    var prettyPrint = false
     
     var opening_literal :String = _  // { or [
     
     var closing_literal :String = _ // } or [
-    
+
+
             
-    override def toString() = {  
+    override def toString():String = {  
         resetBuilder()
-        serialize()        
+        serialize()
+    }
+
+    def toString(prettyPrint: Boolean):String = {
+        this.prettyPrint = prettyPrint
+        toString()
     }
     
     def toOutputStream(outputStream: OutputStream) {
@@ -39,13 +47,14 @@ trait TJSONSerializable {
       
     private def serialize():String = {
         setWrappingLiterals()
-        appendOpening()       
+        opening()
+        newlineIfPretty()
         processBody()
-        appendClosing()
+        closing()
         builder.toString()
     }
       
-
+           
     private def processBody(): Unit = {
         this match {
             case obj: JSONObject => processObject(obj)
@@ -74,32 +83,41 @@ trait TJSONSerializable {
     }
     
     private def appendObjectPair(key: String, value: Any) {
-        append(key);
-        appendSeparator()
-        append(value)            
-        appendComma()
+        tabIfPretty()
+        append(key)
+        tabIfPretty()
+        separator()
+        spaceIfPretty()
+        append(value)        
+        comma()
+        newlineIfPretty()
     }
     
     private def appendArrayValue(value: Any) {
         append(value);
-        appendComma()
+        comma()
+        newlineIfPretty()
     }
 
-    private def appendComma() = builder.append(",")
-            
-    
-    private def appendSeparator() = builder.append(":")
-        
+    private def comma():Unit = builder.append(",")
 
-    private def appendOpening() = builder.append(opening_literal)
+    private def separator() = builder.append(":")
             
+    private def opening() = builder.append(opening_literal)
+
+    private def closing() = deleteLastComma().append(closing_literal)
+                
+    private def tabIfPretty() = if (prettyPrint) builder.append("\t")
+
+    private def newlineIfPretty() = if (prettyPrint) builder.append("\n")
     
-    private def appendClosing() = deleteLastComma().append(closing_literal)
+    private def spaceIfPretty() = if (prettyPrint) builder.append(" ")
         
-        
-    private def deleteLastComma() = builder.deleteCharAt(builder.length -1)        
-            
-        
+    private def deleteLastComma() = {
+        if (prettyPrint) builder.deleteCharAt(builder.length -2)
+        else builder.deleteCharAt(builder.length -1)
+    }
+    
     private def resetBuilder() {        
         if (builder.length() > 1) builder.delete(0, builder.length() - 1)        
     }

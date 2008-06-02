@@ -39,7 +39,7 @@ class ScajorpServlet extends HttpServlet {
         
         val jsonResponse = application.execute(jsonRequest)
 
-        jsonResponse.toWriter(resp.getWriter())
+        jsonResponse.toWriter(resp.getWriter(), application.prettyPrint)
 
     }
 
