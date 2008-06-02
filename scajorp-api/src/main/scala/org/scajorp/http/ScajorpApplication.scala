@@ -55,6 +55,22 @@ abstract class ScajorpApplication {
         methods.foreach(method => if (method.getName() != "$tag") methodRegistry.put(className + "." + method.getName(), method))        
     }
 
+
+   /**
+    * Prints out a list with all methods registered with this application. 
+    */
+    def developmentInfo()
+    {
+        println("******************************************************************************\n"
+            + "*** Scajorp is running in DEVELOPMENT mode.                                 ***\n"
+            + "***                       ^^^^^^^^^^^                                       ***\n"
+            + "*** Registered Methods:                                                     ***\n"
+            + "***" + systemList()+ "***\n"
+            + "*******************************************************************************\n");
+    }
+
+
+
     /**
     * Invokes a method that is registered with this application. If there is no such message,
     * a runtime error will be thrown.

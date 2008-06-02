@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <script type="text/javascript" src="index_raw.js"></script>    
+    <title>Scajorp Raw Demo</title>
+</head>
+<body>
+<h1>Scajorp-Examples</h1>
+
+<p>This page demonstrates Scajorp's capabilities without the use of any client-side framework.</p>
+
+<p>For your convenience the json request strings and json response strings will be displayed.</p>
+
+<p>If you want to digg deeper into the messages sent between your browser and the servlet, use Firefox and install <a
+        href="http://www.getfirebug.com/">Firebug</a>.</p>
+
+<p>Imagine this was a blog administration interface. You want to fetch a list of blog entries.
+    Simply click the button.</p>
+
+<p><input type="button" onclick="retrieveBlogs()" value="Retrieve blogs"/></p>
+
+
+<p id="jsonRequest">[ Request String ]</p>
+<p id="jsonResponse">[ Response String ]</p>
+
+<div id="blogentries">
+
+</div>
+</body>
+</html>

@@ -18,11 +18,16 @@ import org.scajorp.json.JSONResponse
 class ScajorpServlet extends HttpServlet {
 
     /**
-    * The factory used to create application objects
+    * The factory used to create acdpplication objects
     */
     val applicationFactory: TApplicationFactory = new ContextParamApplicationFactory()
     
-    
+
+    override def init() {
+           val application = applicationFactory.createApplication(getServletConfig())
+           application.developmentInfo()
+    }
+
     /**
     * POST-request handler    
     */

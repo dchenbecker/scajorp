@@ -51,7 +51,11 @@ class JSONRequest(reader: BufferedReader) {
     * 
     * @return a requestMap request map
     */
-    private def parse(): Map[String, Any] = JSONParser.parseAll(JSONParser.obj, reader).get
+    private def parse(): Map[String, Any] = {        
+        val map = JSONParser.parseAll(JSONParser.obj, reader).get
+        println("[JSONRequest]: Parsed ==>" + map)
+        map
+    }
 
     
     /**
