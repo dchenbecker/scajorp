@@ -38,7 +38,7 @@ abstract class ScajorpApplication {
             else {
                 invoke(jsonRequest.method, jsonRequest.parametersToArray)
             }                                      
-        return new JSONResponse(rpc_version, result, 1)
+        return new JSONResponse(rpc_version, result, jsonRequest.id)
     }
 
 

@@ -1,11 +1,10 @@
 
 
-function retrieveBlogs() {
-    var data = '{\"jsonrpc\": \"2.0\", \"method\": \"blogEntryService.getAll\", \"params\": [], \"id\": 1}';
-    document.getElementById('jsonRequest').innerHTML = 'Request POST-Body ==> ' + data;
-    var scajorp = new Scajorp("/scajorp/");
-    scajorp.post(data, parseBlogEntries);
+var scajorp = new Scajorp("/scajorp/");
 
+function retrieveBlogs() {
+  //  document.getElementById('jsonRequest').innerHTML = 'Request POST-Body ==> ' + data;
+    scajorp.blogEntryService.getAll(parseBlogEntries);  
 }
 
 function parseBlogEntries(jsonObj, jsonString) {

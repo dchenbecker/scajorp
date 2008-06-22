@@ -19,7 +19,7 @@ public class Start {
 		WebAppContext bb = new WebAppContext();
 		bb.setServer(server);
 		bb.setContextPath("/");
-		bb.setWar("src/main/webapp");
+		bb.setWar("scajorp-examples/src/main/webapp");
 
 		server.addHandler(bb);
 

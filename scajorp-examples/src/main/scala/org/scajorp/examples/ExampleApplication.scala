@@ -15,6 +15,7 @@ class BogusApplication extends ScajorpApplication {
     override def init() {
         register("calculator", classOf[Calculator])
         register("blogEntryService", classOf[BlogEntryService])
+        enablePrettyResults()
     }
 
     

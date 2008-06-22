@@ -28,9 +28,6 @@ class ScajorpServlet extends HttpServlet {
            application.developmentInfo()
     }
 
-    /**
-    * POST-request handler    
-    */
     override def doPost(req: HttpServletRequest, resp: HttpServletResponse) {
         
         val jsonRequest = new JSONRequest(req.getReader())
