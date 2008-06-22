@@ -9,6 +9,17 @@
     <artifactId>scajorp-api</artifactId>
     <name>Scajorp API</name>
     <packaging>jar</packaging>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.5.2</version>
+        </dependency>
+    </dependencies>
+
+
     <build>
         <plugins>
             <plugin>
