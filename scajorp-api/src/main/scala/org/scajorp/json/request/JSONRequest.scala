@@ -1,4 +1,4 @@
-package org.scajorp.json
+package org.scajorp.json.request
 
 import java.io.BufferedReader
 import java.io.StringReader

@@ -1,4 +1,4 @@
-package org.scajorp.json
+package org.scajorp.json.common
 
 import scala.collection.jcl.TreeMap
 

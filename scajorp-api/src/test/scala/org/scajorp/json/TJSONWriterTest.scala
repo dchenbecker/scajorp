@@ -11,6 +11,7 @@ import org.junit.Test
 import org.junit.Assert.assertEquals
 import org.junit.Before
 
+import org.scajorp.json.common.{JSONObject,JSONArray}
 
 class TJSONWriterTest {
     

@@ -3,12 +3,13 @@ package org.scajorp.json
 import java.lang.reflect.Method
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
+
 import scala.collection.Map
 import scala.collection.mutable. {HashSet, Set}
 import scala.StringBuilder
 
-
-import org.scajorp.json._
+import org.scajorp.json.common.{TJSONSerializable,JSONArray,JSONObject}
+import org.scajorp.json.response.{JSONResponse,ValidResponse,ErrorResponse}
 
 class CircularReferenceException(message: String) extends Exception(message)
 
@@ -174,7 +175,7 @@ object JSONSerializer {
 
         // hack, will be removed soon
         val className = poso.getClass().getName()
-        if (className != classOf[JSONResponse].getName()) {
+        if (className != classOf[ValidResponse].getName() && className != classOf[ErrorResponse].getName()) {
             fieldMap += (class_literal -> className)    
         }
         

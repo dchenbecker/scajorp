@@ -1,4 +1,4 @@
-package org.scajorp.json 
+package org.scajorp.json.common 
 
 /**
  * ATTENTION: This trait is only supposed to be mixed-in/extended by JSONObject/JSONArray.

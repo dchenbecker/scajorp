@@ -8,8 +8,9 @@
 package org.scajorp.http
 
 import java.lang.reflect.Method
-import org.scajorp.json.JSONRequest
-import org.scajorp.json.JSONResponse
+import org.scajorp.json.request.JSONRequest
+import org.scajorp.json.response.{JSONResponse,ValidResponse,ErrorResponse}
+
 import scala.collection.mutable.HashMap
 
 
@@ -38,7 +39,7 @@ abstract class ScajorpApplication {
             else {
                 invoke(jsonRequest.method, jsonRequest.parametersToArray)
             }                                      
-        return new JSONResponse(rpc_version, result, jsonRequest.id)
+        return new ValidResponse(rpc_version, result, jsonRequest.id)
     }
 
 

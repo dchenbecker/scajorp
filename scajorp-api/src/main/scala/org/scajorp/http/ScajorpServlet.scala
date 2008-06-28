@@ -6,8 +6,8 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.ServletConfig
 
-import org.scajorp.json.JSONRequest
-import org.scajorp.json.JSONResponse
+import org.scajorp.json.request.JSONRequest
+import org.scajorp.json.response.JSONResponse
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -11,7 +11,8 @@ import org.junit.Test
 import org.junit.Before
 import org.junit.After
 import org.junit.Assert._
-import org.scajorp.json.JSONRequest
+import org.scajorp.json.request.JSONRequest
+import org.scajorp.json.response.ValidResponse
 import java.io.BufferedReader
 import java.io.StringReader
 
@@ -36,9 +37,9 @@ class ScajorpApplicationTest {
     @Test
     def execute() {
         val response = application.execute(jsonRequest)
-        assertEquals(9, response.result)
+        assertEquals(response, ValidResponse("2.0", 9, 5));
     }
-    
+        
     @Test{val expected = classOf[IllegalArgumentException]}
     def execute_wrongParams() {        
         application.execute(invalidJsonRequest)         
