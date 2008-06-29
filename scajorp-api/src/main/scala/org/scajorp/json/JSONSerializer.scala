@@ -90,7 +90,7 @@ object JSONSerializer {
     private def serializePOSO(poso: AnyRef, includes: Option[Set[String]], excludes: Option[Set[String]], seen: Set[Any]): TJSONSerializable = {
         seen += poso
         val fieldMap = getFieldsMap(poso, includes, excludes)
-        return processCollection(fieldMap, seen)
+        return serializeCollection(fieldMap, seen)
     }
 
 
