@@ -8,6 +8,7 @@ import javax.servlet.ServletConfig
 
 import org.scajorp.json.request.JSONRequest
 import org.scajorp.json.response.JSONResponse
+import org.scajorp.json.JSONSerializer
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,13 +40,19 @@ class ScajorpServlet extends HttpServlet {
         
         val jsonResponse = application.execute(jsonRequest)        
 
-        jsonResponse.toWriter(resp.getWriter(), application.prettyPrint)
+        //jsonResponse.toWriter(resp.getWriter(), application.prettyPrint)
+
+        resp.getWriter().write(JSONSerializer.serialize(jsonResponse))
+        
+        resp.getWriter().flush()
 
     }
-
-
 }
 
+
+/**
+* Companion object
+*/
 object ScajorpServlet {
 
     /**

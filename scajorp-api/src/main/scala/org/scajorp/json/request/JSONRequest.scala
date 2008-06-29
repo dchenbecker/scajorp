@@ -16,18 +16,17 @@ import scala.collection.mutable.ArrayBuffer
 * @author Marco Behler
 */
 class JSONRequest(reader: BufferedReader) {
+    
 
+    val requestMap: Option[Map[String, Any]] = parse()
 
-    private val requestMap: Map[String, Any] = parse()
+    val jsonrpc: Option[String] = getVersion()
 
-    val jsonrpc: String = getVersion()
+    val method: Option[String] = getMethod()
 
-    val method: String = getMethod()
+    val params: Option[Collection[Any]] = getParams()
 
-    val params: Collection[Any] = getParams()
-
-    val id: Int = getId()
-
+    val id: Option[Int] = getId()
 
 
     /**
@@ -36,7 +35,7 @@ class JSONRequest(reader: BufferedReader) {
     *  @param json
     *           a valid json string
     */
-    def this(json: String) = this(new BufferedReader(new StringReader(json)))
+    def this(json: String) = this (new BufferedReader(new StringReader(json)))
 
 
 
@@ -46,20 +45,22 @@ class JSONRequest(reader: BufferedReader) {
     *
     *  @return this request's parameters as an array
     */
-    def parametersToArray(): Array[AnyRef] = {
+    def parametersAsArray(): Array[AnyRef] = {
         val result = params match {
-            case x: List[AnyRef] => x.toArray
+            case Some(x: List[AnyRef]) => x.toArray
+            case _ => error("Only lists as parameters atm...")
         }
         result
     }
 
 
-    /**
-    * Request for system.listMethods?
-    * 
-    * @return true or false accordingly   
-    */
-    def systemList() = method == "system.listMethods"
+    
+    def isSystemList = { method != None && method.get == "system.listMethods" }
+
+    def hasParseErrors = { requestMap == None }
+            
+    def hasMissingParameters = { jsonrpc == None || method == None || params == None || id == None }
+
 
 
     /* --------------------------- */
@@ -72,10 +73,12 @@ class JSONRequest(reader: BufferedReader) {
     * 
     * @return a requestMap request map
     */
-    private def parse(): Map[String, Any] = {
-        val map = JSONParser.parseAll(JSONParser.obj, reader).get
-        println("[JSONRequest]: Parsed ==>" + map)
-        map
+    private def parse(): Option[Map[String, Any]] = {
+        val result = JSONParser.parseAll(JSONParser.obj, reader)
+        if (result.successful) {
+            Some(result.get)
+        }
+        else None
     }
 
 
@@ -84,11 +87,14 @@ class JSONRequest(reader: BufferedReader) {
     * 
     * @return the version number or a runtime error if none exists
     */
-    private def getVersion(): String = {
-        requestMap.get("jsonrpc") match {
-            case Some(version: String) => version
-            case _ => error("No version specified for request. Example: {\"jsonrpc\": \"2.0\"...}")
+    private def getVersion(): Option[String] = {
+          if (requestMap != None) {
+            requestMap.get.get("jsonrpc") match {
+                case Some(version: String) => Some(version)
+                case _ => None
+            }
         }
+        else None
     }
 
     /**
@@ -96,11 +102,14 @@ class JSONRequest(reader: BufferedReader) {
     *
     * @return the method or a runtime error if none exists
     */
-    private def getMethod(): String = {
-        requestMap.get("method") match {
-            case Some(method: String) => method
-            case _ => error("No method specified for request. Example: {...\"method\": \"subtract\"...}")
+    private def getMethod(): Option[String] = {
+        if (requestMap != None) {
+            requestMap.get.get("method") match {
+                case Some(method: String) => Some(method)
+                case _ => None
+            }            
         }
+        else None                 
     }
 
     /**
@@ -108,11 +117,14 @@ class JSONRequest(reader: BufferedReader) {
     *
     * @return the parameters or a runtime error if none exist
     */
-    private def getParams(): Collection[Any] = {
-        requestMap.get("params") match {
-            case Some(params: Collection[_]) => params
-            case _ => error("No params specified for request. If no parameters are needed, an empty list must be supplied. Example: {...\"params\": [42, 23]...}")
+    private def getParams(): Option[Collection[Any]] = {
+          if (requestMap != None) {
+            requestMap.get.get("params") match {
+                case Some(params: Collection[_]) => Some(params)
+                case _ => None
+            }
         }
+        else None       
     }
 
     /**
@@ -120,11 +132,14 @@ class JSONRequest(reader: BufferedReader) {
     *
     * @return id or a runtime error if none exists
     */
-    private def getId(): Int = {
-        requestMap.get("id") match {
-            case Some(id: Int) => id
-            case _ => error("No id specified for request. Example: ...\"id\": 1}")
+    private def getId(): Option[Int] = {
+        if (requestMap != None) {
+            requestMap.get.get("id") match {
+                case Some(id: Int) => Some(id)
+                case _ => None
+            }
         }
+        else None          
     }
 
 

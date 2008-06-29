@@ -9,7 +9,7 @@ package org.scajorp.http
 
 import java.lang.reflect.Method
 import org.scajorp.json.request.JSONRequest
-import org.scajorp.json.response.{JSONResponse,ValidResponse,ErrorResponse}
+import org.scajorp.json.response.{JSONResponse,ValidResponse,ErrorResponse, JSONError}
 
 import scala.collection.mutable.HashMap
 
@@ -32,14 +32,19 @@ abstract class ScajorpApplication {
     * @return the method's result
     */
     def execute(jsonRequest: JSONRequest): JSONResponse = {
-        val result =
-            if (jsonRequest.systemList()) {
-                systemList()
-            }
-            else {
-                invoke(jsonRequest.method, jsonRequest.parametersToArray)
-            }                                      
-        return new ValidResponse(rpc_version, result, jsonRequest.id)
+        
+        if (jsonRequest.hasParseErrors) {
+            ErrorResponse(rpc_version, JSONError(-32700,"Parse Error"), -1)
+        }
+        else if (jsonRequest.hasMissingParameters) {
+            ErrorResponse(rpc_version, JSONError(-32600,"Invalid Request"), -1)
+        }
+        else if (jsonRequest.isSystemList) {
+            ValidResponse(rpc_version, systemList(), jsonRequest.id.get)
+        }
+        else {
+            invoke(jsonRequest)
+        }        
     }
 
 
@@ -84,22 +89,31 @@ abstract class ScajorpApplication {
     *
     * @return the method's result
     */
-    private def invoke(methodName: String, parameters: Array[AnyRef]): Any = {
+    private def invoke(jsonRequest: JSONRequest): JSONResponse = {
+        
         def doInvoke(method: Method) = {
             val instance = method.getDeclaringClass().newInstance()
-            method.invoke(instance, parameters)
-        }        
-        val result = methodRegistry.get(methodName) match {
-            case Some(method: Method) => doInvoke(method)
-            case None => error("There is no method with name[=" + methodName + "] registered with this service.")
+            try {
+                ValidResponse(rpc_version, method.invoke(instance, jsonRequest.parametersAsArray), jsonRequest.id.get)
+            }
+            catch {
+                case illegalArgs :IllegalArgumentException =>
+                     ErrorResponse(rpc_version, JSONError(-32602,"Invalid params"), jsonRequest.id.get)
+            }
+
         }
-        result
+        
+        methodRegistry.get(jsonRequest.method.get) match {
+            case Some(method: Method) => doInvoke(method)
+            case None => ErrorResponse(rpc_version, JSONError(-32601,"Method not found"), jsonRequest.id.get)
+        }        
+
     }
 
+    
     private def systemList(): List[String] = {
          var result = List[String]()
-         methodRegistry.keys.foreach(value => result = result + value)
-         println("SYSTEM " + result)
+         methodRegistry.keys.foreach(value => result = result + value)        
          result
     }
 

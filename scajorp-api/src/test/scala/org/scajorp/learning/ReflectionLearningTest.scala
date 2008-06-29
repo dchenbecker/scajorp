@@ -26,5 +26,7 @@ class ReflectionLearningTest {
     val fields = friend.getClass().getDeclaredFields()        
     assertEquals("name", fields(0).getName())
   }
+
+    
     
 }
