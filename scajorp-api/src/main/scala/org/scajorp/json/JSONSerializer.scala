@@ -159,7 +159,7 @@ object JSONSerializer {
     *
     * @return the appropriate json value (value, JSONObject or JSONArray)
     */
-    def jsonValue(value: Any, seen: Set[Any]) = {
+    private def jsonValue(value: Any, seen: Set[Any]) = {
         value match {
             case (s: String) => value
             case (i: Integer) => value
@@ -212,6 +212,7 @@ object JSONSerializer {
         fieldMap
     }
 
+
     
     def handleCircularRef(msg: String) = {
         if (throwOnCircularRefs) {
@@ -222,7 +223,4 @@ object JSONSerializer {
  
 }
 
-/**
-* Exception that will be thrown when throwOnCircularRefs is true and a circular reference is encountered. 
-*/
 class CircularReferenceException(message: String) extends Exception(message)
