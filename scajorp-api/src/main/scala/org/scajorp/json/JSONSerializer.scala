@@ -5,28 +5,31 @@ import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 
 import scala.collection.Map
-import scala.collection.mutable. {HashSet, Set}
+import scala.collection.mutable.{HashSet, Set}
 import scala.StringBuilder
 
 import org.scajorp.json.common.{TJSONSerializable,JSONArray,JSONObject}
-import org.scajorp.json.response.{JSONResponse,ValidResponse,ErrorResponse}
-
-class CircularReferenceException(message: String) extends Exception(message)
+import org.scajorp.json.response.{JSONResponse,ValidResponse,ErrorResponse, JSONError}
 
 /**
- * Utility object to handle the serialization of objects into their JSON
- * representation.
+ * Utility object, which serializes objects into their JSON representation. 
  *
  * @author Marco Behler
  * @author Derek Chen-Becker
  */
 object JSONSerializer {
     
-    var throwOnCircularRefs = false
-    
+
     val class_literal = "jsonClass"
-   
-    var prettyPrint = false // TODO revise
+    
+    var throwOnCircularRefs = false
+       
+    var prettyPrint = false 
+
+
+    
+    /* ---------- PUBLIC API ---------- */
+    
     
     /**
     * Turns the given object into a JSON string.
@@ -55,36 +58,49 @@ object JSONSerializer {
     */
     def serializeExcept(obj: AnyRef, excludes: Set[String]): String = serializeInternal(obj, None, Some(excludes))
 
+
+
+    
+
+    /* ----------- INTERNAL API ---------- */
+    
+
     /**
-    * Does the heavy lifting. Creates a JSONArray (from a collection) or a JSONObject
-    * (from a poso) and simply invokes its toString() method.    
+    * Turns any object into a TJSONSerializable and invokes its toString() method.   
     *    
     * @return the JSON string
     */
     private def serializeInternal(obj: AnyRef, includes: Option[Set[String]], excludes: Option[Set[String]]): String = {
         val seen = new HashSet[Any]()
         val jsonEntity = obj match {
-            case collection: Collection[_] => processCollection(collection, seen)
-            case _ => processPOSO(obj, includes, excludes, seen)
+            case collection: Collection[_] => serializeCollection(collection, seen)
+            case _ => serializePOSO(obj, includes, excludes, seen)
         }
         jsonEntity.toString(prettyPrint)
     }
 
+
+    
     /**
-    * Create a JSONObject from any (P)lain (O)ld (S)cala (O)bject. Will turn
-    * the pojo into a Map(fieldName -> fieldValue) and delegate responsibilty
-    * to processCollection().
+    * Serializes any (P)lain (O)ld (S)cala (O)bject, by converting it into 
+    * a Map(fieldName -> fieldValue) and invoking serializeCollection()
     *
     * @return the JSONObject
     */
-    private def processPOSO(poso: AnyRef, includes: Option[Set[String]], excludes: Option[Set[String]], seen: Set[Any]): TJSONSerializable = {
+    private def serializePOSO(poso: AnyRef, includes: Option[Set[String]], excludes: Option[Set[String]], seen: Set[Any]): TJSONSerializable = {
         seen += poso
         val fieldMap = getFieldsMap(poso, includes, excludes)
         return processCollection(fieldMap, seen)
     }
 
 
-    private def processCollection(collection: Collection[Any], seen: Set[Any]): TJSONSerializable = {
+   /**
+    * Serializes collections. Will turn Sets and Sequences into {@link JSONArray}.
+    * Turns Maps into {@link JSONObject}.
+    *
+    * @return the JSONArray
+    */
+    private def serializeCollection(collection: Collection[Any], seen: Set[Any]): TJSONSerializable = {
         seen += collection // TODO redundant when pojo, harmful?
         val result = collection match {
             case map: Map[String, Any] => createJSONObject(map, seen)
@@ -95,6 +111,12 @@ object JSONSerializer {
         return result
     }
 
+    
+   /**
+    * Creates a {@link JSONObject} from a Map[String,Any].
+    *
+    * @return the JSONObject 
+    */
     private def createJSONObject(map: Map[String, Any], seen: Set[Any]): JSONObject = {
         val result = new JSONObject()
         map.foreach({
@@ -108,6 +130,12 @@ object JSONSerializer {
         return result
     }
 
+    
+    /**
+    * Creates a {@link JSONArray} from a Sequence or Set. 
+    *
+    * @return the JSONObject
+    */
     private def createJSONArray(col: Collection[Any], seen: Set[Any]): JSONArray = {
         val result = new JSONArray()
         col.foreach(value => {
@@ -120,20 +148,16 @@ object JSONSerializer {
         return result
     }
 
-    def handleCircularRef(msg: String) = {
-        if (throwOnCircularRefs) {
-            throw new CircularReferenceException(msg)
-        }
-    }
+
 
 
     /**
-    * This method will return the JSON value of Any. All AnyVals will remain
-    * unchanged, whereas all Sequences will be converted to JSONArrays and all
-    * maps will be converted to JSONObjects. POSOs will naturally be converted
-    * to JSONObject's as well.
+    * This method will return the JSON value of {@link Any}.
     *
-    * @return the json value (value, JSONObject or JSONArray)
+    * All {@link AnyVal}s will remain unchanged. Sequences will be converted to {@link JSONArray}.
+    * Maps and POSOs will naturally be converted to {@link JSONObject}s.    
+    *
+    * @return the appropriate json value (value, JSONObject or JSONArray)
     */
     def jsonValue(value: Any, seen: Set[Any]) = {
         value match {
@@ -144,9 +168,10 @@ object JSONSerializer {
             case (s: java.lang.Short) => value
             case (b: java.lang.Byte) => value
             case (b: java.lang.Boolean) => value
+            case (date: java.util.Date) => date.getTime()
             case null => value
-            case collection: Collection[Any] => processCollection(collection, seen)
-            case poso: AnyRef => processPOSO(poso, None, None, seen)
+            case collection: Collection[Any] => serializeCollection(collection, seen)
+            case poso: AnyRef => serializePOSO(poso, None, None, seen)
         }
     }
 
@@ -173,9 +198,10 @@ object JSONSerializer {
 
         val fieldMap = scala.collection.mutable.Map.empty[String, Any]
 
-        // hack, will be removed soon
         val className = poso.getClass().getName()
-        if (className != classOf[ValidResponse].getName() && className != classOf[ErrorResponse].getName()) {
+        if (className != classOf[ValidResponse].getName()
+                && className != classOf[ErrorResponse].getName()
+                && className != classOf[JSONError].getName()) {
             fieldMap += (class_literal -> className)    
         }
         
@@ -186,5 +212,17 @@ object JSONSerializer {
         fieldMap
     }
 
+    
+    def handleCircularRef(msg: String) = {
+        if (throwOnCircularRefs) {
+            throw new CircularReferenceException(msg)
+        }
+    }
+
  
 }
+
+/**
+* Exception that will be thrown when throwOnCircularRefs is true and a circular reference is encountered. 
+*/
+class CircularReferenceException(message: String) extends Exception(message)

@@ -12,6 +12,7 @@ object JSONParser extends JavaTokenParsers {
 
     def obj: Parser[Map[String, Any]] =
         "{"~> repsep(member, ",") <~"}" ^^ (Map() ++ _)
+    
     def arr: Parser[List[Any]] =
         "["~> repsep(value, ",") <~"]"
         
@@ -33,36 +34,6 @@ object JSONParser extends JavaTokenParsers {
         return x.substring(1, x.length -1)
     }
 
-
-  /*def resolveType(input: List[_]): Any = {
-    var objMap = Map[String, Any]()
-    
-    if (input.forall { 
-      case (key: String, value: List[_]) =>
-        objMap += (key -> resolveType(value))
-        true
-      case (key : String, value : Any) =>
-        objMap += (key -> value)
-        true
-      case _ => false
-    }) objMap
-    else
-      input
-  }*/
-
-//  def parseAll (input : Reader) = {
-//    def readLines (in : BufferedReader, builder : StringBuilder) : String = in.readLine match {
-//      case null => builder.toString
-//      case data : String => readLines(in, builder.append(data))
-//    }
-//
-//    val stringData = readLines(new BufferedReader(input), new StringBuilder)
-//
-//    JSON.parse(stringData) match {
-//      case Some(x) => Some(resolveType(x))
-//      case None => None
-//    }
-//  }
     
     /**
      * Takes the given map representing a JSON Object and uses the map attributes to instantiate

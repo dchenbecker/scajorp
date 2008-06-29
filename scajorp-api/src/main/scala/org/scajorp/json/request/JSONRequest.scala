@@ -54,7 +54,8 @@ class JSONRequest(reader: BufferedReader) {
     }
 
 
-    
+
+
     def isSystemList = { method != None && method.get == "system.listMethods" }
 
     def hasParseErrors = { requestMap == None }
@@ -107,9 +108,9 @@ class JSONRequest(reader: BufferedReader) {
             requestMap.get.get("method") match {
                 case Some(method: String) => Some(method)
                 case _ => None
-            }            
+            }
         }
-        else None                 
+        else None
     }
 
     /**
