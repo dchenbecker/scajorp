@@ -3,11 +3,22 @@ package org.scajorp.json.response
 import java.io.Writer
 
 /**
-* Response and error case classes.
+* JSONResponse case classes.
 * 
 * @author Marco Behler
 */
-abstract class JSONResponse
+abstract class JSONResponse  {
+
+    /**
+    * Writes this response to a {@link Writer} and flushes
+    * the writer immediately afterwards. 
+    */
+    def toWriter(writer: Writer, prettyPrint : Boolean) {
+        JSONSerializer.prettyPrint = prettyPrint
+        writer.write(JSONSerializer.serialize(this))
+        writer.flush()
+    }
+}
 
 case class ValidResponse(val jsonrpc: String, val result: Any, val id: Int) extends JSONResponse
 

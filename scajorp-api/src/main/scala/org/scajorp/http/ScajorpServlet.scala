@@ -34,29 +34,28 @@ class ScajorpServlet extends HttpServlet {
 
     override def doPost(req: HttpServletRequest, resp: HttpServletResponse) {
         
-        val jsonRequest = new JSONRequest(req.getReader())
+        val jsonRequest: JSONRequest = new JSONRequest(req.getReader())
 
         val application = ScajorpServlet.createApplication(getServletConfig())
         
-        val jsonResponse = application.execute(jsonRequest)        
+        val jsonResponse: JSONResponse = application.execute(jsonRequest)        
 
-        //jsonResponse.toWriter(resp.getWriter(), application.prettyPrint)
+        jsonResponse.toWriter(resp.getWriter(), application.prettyPrint)
 
-        resp.getWriter().write(JSONSerializer.serialize(jsonResponse))
         
-        resp.getWriter().flush()
 
     }
 }
 
 
 /**
-* Companion object
+* Companion object, that can create ScajorpApplication instances
+* from a {@link ServletConfig}.
 */
 object ScajorpServlet {
 
     /**
-    * context parameter name that must contain the class name of the application
+    * Context parameter name that must contain the class name of the application
     */
     val application_class_param = "applicationClassName";
 
